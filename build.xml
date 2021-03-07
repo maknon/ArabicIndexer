@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Build" basedir="." default="win_exe">
+
+	<property name="build.dir"				value="build"/>
+	<property name="app.name"				value="مفهرس المخطوطات"/>
+	<property name="tools.dir"				value="E:\Others\MIE Support programs"/>
+	<property name="makensis.exe"			value="${tools.dir}\nsis\makensis.exe"/>
+	<property name="launch4j.jar"			value="${tools.dir}\launch4j\launch4j.jar"/>
+	<property name="ResourceHacker.exe"		value="${tools.dir}\Resource Hacker\ResourceHacker.exe"/>
+	<property name="jdk.linux"				value="openjdk-15_linux-x64_bin.tar.gz"/>
+	<property name="jdk.mac"				value="openjdk-15_osx-x64_bin.tar.gz"/>
+	<property name="jdk.win"				value="openjdk-15_windows-x64_bin.zip"/> <!-- www.bell-sw.com -->
+	<property name="java.old"				value="C:\Users\Ebrahim\Desktop\zulu8.46.0.19-ca-jdk8.0.252-win_x64\bin\java"/>
+
+	<path id="class.path">
+		<fileset dir="${build.dir}" includes="lib/*"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+	<target name="copy_resources_windows">
+		<copy todir="${build.dir}">
+			<fileset dir="." includes="setting/**,db/**,arabicIndex/**,src/**,
+			arabicLuceneIndex/**,englishIndex/**,bin/**,images/**,images.nsis/**,
+			language/**,lib/**,arabicRootsIndex/**,arabicRootsTableIndex/**,temp/**,pdf/**,
+			setup.nsi,FileAssociation.nsh,arabicindexer.xml,startup.bat,build_pom.xml,
+			DBDefrag.bat,DBEmpty.bat,ArabicIndexer.l4j.ini,launcher.xml,launcher.bat">
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="copy_resources_*nix">
+		<copy todir="${build.dir}">
+			<fileset dir="." includes="setting/**,db/**,arabicIndex/**,src/**,
+			arabicLuceneIndex/**,englishIndex/**,bin/Amiri-Regular.otf,bin/JameelNooriNastaleeq.ttf,
+			images/**,language/**,lib/**,arabicRootsIndex/**,arabicRootsTableIndex/**,temp/**,
+			pdf/**,build_pom.xml,startup.sh,decompress.sh,DBDefrag.sh,DBEmpty.sh,
+			launcher.sh,uninstall.sh">
+				<include name="${app.name}.app/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile_windows">
+		<antcall target="copy_resources_windows"/>
+		<antcall target="javac_src"/>
+	</target>
+
+	<target name="compile_linux">
+		<antcall target="copy_resources_*nix"/>
+		<antcall target="javac_src"/>
+	</target>
+
+	<target name="javac_src">
+		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
+			<arg value="/c mvn -f build_pom.xml dependency:copy-dependencies -DoutputDirectory=lib -Dhttps.protocols=TLSv1.2"/>
+		</exec>
+		<javac includeantruntime="false"
+			   srcdir="${build.dir}/src"
+			   destdir="${build.dir}"
+			   encoding="UTF-8"
+			   classpathref="class.path"/>
+	</target>
+
+	<path id="build-classpath">
+		<fileset dir="${build.dir}/lib">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="jar">
+		<pathconvert property="manifest.classpath" pathsep=" ">
+			<path refid="build-classpath"/>
+			<mapper>
+				<chainedmapper>
+					<flattenmapper/>
+					<globmapper from="*.jar" to="lib/*.jar"/>
+				</chainedmapper>
+			</mapper>
+		</pathconvert>
+		<jar destfile="${build.dir}/ArabicIndexer.jar">
+			<manifest>
+				<attribute name="Main-Class" value="com.maknoon.ArabicIndexer"/>
+				<attribute name="Class-Path" value=". ${manifest.classpath}"/>
+			</manifest>
+		</jar>
+		<jar destfile="${build.dir}/Launcher.jar">
+			<manifest>
+				<attribute name="Main-Class" value="com.maknoon.Launcher"/>
+				<attribute name="Class-Path" value=". ${manifest.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="jdk_win">
+		<unzip src="${tools.dir}/${jdk.win}" dest="${build.dir}/jdk">
+			<cutdirsmapper dirs="1" />
+		</unzip>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${build.dir}/jdk">
+				<include name="jmods/**"/>
+				<include name="demo/**"/>
+				<include name="legal/**"/>
+				<include name="lib/src.zip"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="launch4j">
+
+		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
+			<arg value="/c"/>
+			<arg value='"${java.old}" -Dfile.encoding=windows-1256 -jar "${launch4j.jar}" arabicindexer.xml'/>
+		</exec>
+		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
+			<arg value="/c"/>
+			<arg value='"${java.old}" -Dfile.encoding=windows-1256 -jar "${launch4j.jar}" launcher.xml'/>
+		</exec>
+
+		<!-- launch4j is not working with jdk newer than 1.8
+		<java dir="${build.dir}" jar="${launch4j.jar}" fork="true">
+			<arg value="arabicindexer.xml"/>
+		</java>
+		<java dir="${build.dir}" jar="${launch4j.jar}" fork="true">
+			<arg value="launcher.xml"/>
+		</java>
+		-->
+	</target>
+
+	<target name="ResourceHacker">
+		<exec dir="${build.dir}" executable="${ResourceHacker.exe}" failonerror="true" >
+			<arg value="-open"/>
+			<arg value="ArabicIndexer.exe"/>
+			<arg value="-save"/>
+			<arg value="ArabicIndexer.exe"/>
+			<arg value="-action"/>
+			<arg value="add"/>
+			<arg value="-res"/>
+			<arg value="images.nsis\icon_biuf.ico"/>
+			<arg value="-mask"/>
+			<arg value="ICONGROUP,2,"/>
+		</exec>
+		<exec dir="${build.dir}" executable="${ResourceHacker.exe}" failonerror="true" >
+			<arg value="-open"/>
+			<arg value="Launcher.exe"/>
+			<arg value="-save"/>
+			<arg value="Launcher.exe"/>
+			<arg value="-action"/>
+			<arg value="add"/>
+			<arg value="-res"/>
+			<arg value="images.nsis\icon_biuf.ico"/>
+			<arg value="-mask"/>
+			<arg value="ICONGROUP,2,"/>
+		</exec>
+	</target>
+
+	<target name="nsis">
+		<exec dir="${build.dir}" executable="${makensis.exe}" failonerror="true" >
+			<arg value="setup.nsi"/>
+		</exec>
+	</target>
+
+	<target name="jdk_mac">
+		<move file="${build.dir}/com/maknoon" tofile="${build.dir}/${app.name}.app/Contents/Java/com/maknoon"/>
+		<move file="${build.dir}/db" tofile="${build.dir}/${app.name}.app/Contents/Java/db"/>
+		<move file="${build.dir}/images" tofile="${build.dir}/${app.name}.app/Contents/Java/images"/>
+		<move file="${build.dir}/arabicIndex" tofile="${build.dir}/${app.name}.app/Contents/Java/arabicIndex"/>
+		<move file="${build.dir}/englishIndex" tofile="${build.dir}/${app.name}.app/Contents/Java/englishIndex"/>
+		<move file="${build.dir}/language" tofile="${build.dir}/${app.name}.app/Contents/Java/language"/>
+		<move file="${build.dir}/lib" tofile="${build.dir}/${app.name}.app/Contents/Java/lib"/>
+		<move file="${build.dir}/arabicLuceneIndex" tofile="${build.dir}/${app.name}.app/Contents/Java/arabicLuceneIndex"/>
+		<move file="${build.dir}/arabicRootsIndex" tofile="${build.dir}/${app.name}.app/Contents/Java/arabicRootsIndex"/>
+		<move file="${build.dir}/arabicRootsTableIndex" tofile="${build.dir}/${app.name}.app/Contents/Java/arabicRootsTableIndex"/>
+		<move file="${build.dir}/setting" tofile="${build.dir}/${app.name}.app/Contents/Java/setting"/>
+		<move file="${build.dir}/temp" tofile="${build.dir}/${app.name}.app/Contents/Java/temp"/>
+		<move file="${build.dir}/pdf" tofile="${build.dir}/${app.name}.app/Contents/Java/pdf"/>
+		<move file="${build.dir}/DBDefrag.sh" tofile="${build.dir}/${app.name}.app/Contents/Java/DBDefrag.sh"/>
+		<move file="${build.dir}/DBEmpty.sh" tofile="${build.dir}/${app.name}.app/Contents/Java/DBEmpty.sh"/>
+		<move file="${build.dir}/ArabicIndexer.jar" tofile="${build.dir}/${app.name}.app/Contents/Java/ArabicIndexer.jar"/>
+		<move file="${build.dir}/Launcher.jar" tofile="${build.dir}/${app.name}.app/Contents/Java/Launcher.jar"/>
+		<move file="${build.dir}/bin/Amiri-Regular.otf" tofile="${build.dir}/${app.name}.app/Contents/Java/bin/Amiri-Regular.otf"/>
+		<move file="${build.dir}/bin/JameelNooriNastaleeq.ttf" tofile="${build.dir}/${app.name}.app/Contents/Java/bin/JameelNooriNastaleeq.ttf"/>
+
+		<!-- for Oracle binaries -->
+		<untar src="${tools.dir}/${jdk.mac}" dest="${build.dir}/${app.name}.app/Contents/PlugIns/jdk" compression="gzip">
+			<cutdirsmapper dirs="4" />
+		</untar>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${build.dir}/${app.name}.app/Contents/PlugIns/jdk">
+				<include name="**/*"/>
+				<exclude name="**/lib/**"/>
+				<exclude name="**/include/**"/>
+				<exclude name="**/conf/**"/>
+				<exclude name="**/bin/**"/>
+			</fileset>
+			<fileset dir="${build.dir}/${app.name}.app/Contents/PlugIns/jdk">
+				<include name="lib/src.zip"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="tar_gz_sh_linux">
+		<tar destfile="${build.dir}/payload.tar.gz" compression="gzip">
+			<tarfileset dir="${build.dir}" includes="ArabicIndexer.jar,startup.sh,
+			Launcher.jar,launcher.sh,uninstall.sh,bin/**,arabicIndex/**,com/**,images/**,
+			language/**,lib/**,setting/**,arabicLuceneIndex/**,arabicRootsIndex/**,
+			db/**,luceneIndex/**,arabicRootsTableIndex/**,englishIndex/**,DBDefrag.sh,DBEmpty.sh,jdk/**"/>
+		</tar>
+		<concat destfile="${build.dir}/ArabicIndexerVMx64.sh" binary="yes">
+			<fileset file="${build.dir}/decompress.sh" />
+			<fileset file="${build.dir}/payload.tar.gz" />
+		</concat>
+	</target>
+
+	<target name="jdk_linux">
+		<untar src="${tools.dir}/${jdk.linux}" dest="${build.dir}/jdk" compression="gzip">
+			<cutdirsmapper dirs="1" />
+		</untar>
+		<delete includeEmptyDirs="true">
+			<fileset dir="${build.dir}/jdk">
+				<include name="jmods/**"/>
+				<include name="demo/**"/>
+				<include name="legal/**"/>
+				<include name="lib/src.zip"/>
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="tar_gz_mac">
+		<tar destfile="${build.dir}/ArabicIndexerMacOS.tar.gz" compression="gzip">
+			<tarfileset filemode="755" dir="${build.dir}">
+				<include name="${app.name}.app/**"/>
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="tar_gz_win">
+		<tar destfile="${build.dir}/ArabicIndexerWin64.tar.gz" compression="gzip">
+			<tarfileset filemode="755" dir="${build.dir}">
+				<include name="**"/>
+				<exclude name="src/**"/>
+				<exclude name="images.nsis/**"/>
+				<exclude name="build_pom.xml"/>
+				<exclude name="arabicindexer.xml"/>
+				<exclude name="FileAssociation.nsh"/>
+				<exclude name="setup.nsi"/>
+				<exclude name="launcher.xml"/>
+				<exclude name="Launcher.jar"/>
+				<exclude name="Launcher.exe"/>
+				<exclude name="launcher.bat"/>
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="win" depends="clean,compile_windows,jar,jdk_win,launch4j,ResourceHacker,tar_gz_win"/>
+	<target name="win_exe" depends="clean,compile_windows,jar,jdk_win,launch4j,ResourceHacker,nsis"/>
+	<target name="mac" depends="clean,compile_linux,jar,jdk_mac,tar_gz_mac"/>
+	<target name="linux" depends="clean,compile_linux,jar,jdk_linux,tar_gz_sh_linux"/>
+
+</project>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>LSMinimumSystemVersion</key>
+		<string>10.6.0</string>
+		<key>CFBundleExecutable</key>
+		<string>myJavaApplicationStub</string>
+		<key>CFBundleName</key>
+		<string>المفهرس</string>
+		<key>CFBundleVersion</key>
+		<string>2.0</string>
+		<key>CFBundleIconFile</key>
+		<string>icon.icns</string>
+		<key>CFBundleIdentifier</key>
+		<string>ArabicIndexer</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>NSHumanReadableCopyright</key>
+		<string>©2020,Maknoon Apps</string>
+		<key>NSHighResolutionCapable</key>
+		<string>true</string>
+		<!-- myJavaApplicationStub is a shell script not a native stub that can receive AppleEvents that is triggered from clicking the registered files using the below code
+		<key>CFBundleDocumentTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeName</key>
+				<string>ملف بيانات مفهرس المخطوطات</string>
+				<key>CFBundleTypeIconFile</key>
+				<string>icon_biuf.icns</string>
+				<key>CFBundleTypeRole</key>
+				<string>Viewer</string>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>biuf</string>
+				</array>
+			</dict>
+		</array>
+		-->
+	</dict>
+</plist>

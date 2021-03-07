@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/TODO.txt" charset="windows-1256" />
+    <file url="file://$PROJECT_DIR$/src/classes/ArabicAnalyzer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/classes/ArabicRootAnalyzer.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/classes/ShamelaWithPdf.java" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

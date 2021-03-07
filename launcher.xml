@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="windows-1256"?>
+<launch4jConfig>
+    <dontWrapJar>true</dontWrapJar>
+    <headerType>gui</headerType>
+    <jar>Launcher.jar</jar>
+    <outfile>Launcher.exe</outfile>
+    <chdir>.</chdir>
+    <priority>normal</priority>
+    <downloadUrl>https://www.oracle.com/java/technologies/javase-downloads.html</downloadUrl>
+    <supportUrl>http://www.maknoon.com</supportUrl>
+    <stayAlive>false</stayAlive>
+    <restartOnCrash>false</restartOnCrash>
+    <icon>images.nsis\icon.ico</icon>
+    <jre>
+        <path>jdk</path>
+        <bundledJre64Bit>true</bundledJre64Bit>
+        <bundledJreAsFallback>false</bundledJreAsFallback>
+        <jdkPreference>jdkOnly</jdkPreference>
+        <runtimeBits>64</runtimeBits>
+    </jre>
+    <versionInfo>
+        <fileVersion>2.0.0.0</fileVersion>
+        <txtFileVersion>2.0</txtFileVersion>
+        <fileDescription>Manuscripts Indexer Launcher</fileDescription>
+        <copyright>©2020 Maknoon Apps</copyright>
+        <productVersion>2.0.0.0</productVersion>
+        <txtProductVersion>2.0</txtProductVersion>
+        <productName>Manuscripts Indexer</productName>
+        <companyName>Maknoon Apps</companyName>
+        <internalName>Maknoon Manuscripts Indexer</internalName>
+        <originalFilename>Launcher.exe</originalFilename>
+        <language>ARABIC</language>
+    </versionInfo>
+</launch4jConfig>

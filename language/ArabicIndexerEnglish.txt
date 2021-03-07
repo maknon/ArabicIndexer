@@ -1,0 +1,150 @@
+Yes
+No
+, Folder: 
+Warning
+You didn't select a section/author to add a book or the root node to add a section/author.
+Error
+Cancel
+Author
+Category
+You cann't edit the root node.
+Type
+Apply
+Browse for PDF/DjVu files or manuscripts folders.
+Authors
+You didn't select books files.
+Edit Section Name
+Add a book
+You didn't select PDF/DjVu files for the books.
+The following book file exists in one of the sections and you can not repeat the books:
+Book Title
+Book Location
+You cann't browse the root node.
+Some of the books titles, authors or sections are empty. Please fill all the information.
+Sections
+You can't delete the root node.
+Are you sure you want to delete: 
+You didn't select any section, book or author to be deleted.
+Section: 
+, Book: 
+These Books are not available now (they maybe deleted, their names or locations were changed or they are recently imported and their files are not placed in the correct location):
+Do you want to delete them with their indexing files?
+Section name is empty. Please put a correct title for it.
+OCR PDF convertor
+Title or Author is empty. Please fill it.
+You didn't select a section or a book or author to be edited.
+You have to choose either one book or one section or one author to be edited. You cann't edit more than one item.
+You have to choose either one section/author to add a book to it or the root node to add a section/author. You cann't add to more than one of them.
+You didn't enter what you want to search for in the books lists.
+You didn't select any book or section to be indexed.
+The following books are already indexed. Do you want to re-index them again?
+Editing the author needs a re-indexing of his books. Do you want to continue?
+There are no books to be indexed!
+Edit Author name
+Author name is empty. Please put a correct name for him.
+Continue
+Enter a correct word consisting of two letters or more.
+This book is already selected in this menu. Specify another one.
+Delete row: 
+Book Folder
+The following manuscript folder does not contain any image (it should be named with pure numbers) so it will not be added:
+Edit the book name, author and it's section
+Deleting data
+Editing a book needs a re-indexing of this book. Do you want to continue?
+Editing a section needs a re-indexing of all the books in this section. Do you want to continue?
+Editing a multi-volume book needs a re-indexing of these volumes. Do you want to continue?
+Editing a multi-volume book and it's author/section.
+Display/Edit
+Books List
+Authors List
+Attach Books' files with indexes
+Exporting information
+Exported Part Title
+Details
+You didn't select anything to be exported.
+Empty input. Put the correct page number
+Please provide the title and the description of the exported portion of the database.
+Books Indexer Update Files
+Save
+Export Database
+There are repeated PDF/DjVu file names (although different paths) and this is not allowed in the export process:
+Save changes for this page
+The following book file is corrupted os does not contain any page so it will no be added:
+Browse the page
+Stop
+You do not have permissions to save file in this folder. Choose another one.
+There are some missing PDF/DJVU files for some books, these files will not be included in the exported file:
+Search Range
+Next Page
+Previous Page
+Make it the default                     
+Auto determining the CD/DVD path
+There are more than one CD/DVD. Determind one of them.
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+---- Default in English ------
+Sections
+Books and Authors Panel
+Order Lists
+[ Book Section Name , Book Name , Book # if exists ]                           
+Add section or a book to a section
+Add
+Edit
+Delete
+Enable editing
+Indexing
+Export Book's lists and there indexing files
+Export
+Search in books list
+Search Panel
+Search
+Search Panel [Results: 
+------------------
+------------------
+There is another version of the program running now. You cannot run two instances of the program.
+Warning
+Exit
+Shamela Books convertor
+Path
+------------------
+------------------
+------------------
+Search Range
+Search Types
+Specify search range
+Out of memory. if you need more memory edit the file 'ArabicIndexer.l4j.ini'
+under the prgram folder as follow:
+- Increase the memory size from Xmx128m to Xmx256m or more if require.
+[For Linux/Unix change in 'startup.sh' or in 'Info.plist' for Mac OSX]
+Standard
+Search by Arabic Roots
+Search by Affix Removal, light10 (Arabic)
+Standard
+by Arabic Roots
+by Affix Removal, light10 (Arabic)
+Standard Indexing
+Indexing by Arabic Roots
+Indexing by Affix Removal, light10 (Arabic)
+This page is not available in this document
+File
+Import Books
+اللغة (Language) (زبان)
+Exit
+Help
+Help Contents
+About
+It is forbidden to use this program in violation of the curriculum of the Sunnah
+This program is licensed to all Muslims
+This program is not for sale
+Copyright © 2020, Maknoon.com
+Version 2.0
