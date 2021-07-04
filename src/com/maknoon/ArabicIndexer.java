@@ -131,6 +131,9 @@ public class ArabicIndexer extends JFrame
 	// Version 2.1
 	WebCheckBoxTree<DefaultMutableTreeNode> searchTree, authorSearchTree;
 
+	static String version;
+	static String biuf_version;
+
 	final CheckStateChangeListener<DefaultMutableTreeNode> authorSearchTreeChangeListener = new CheckStateChangeListener<>()
 	{
 		@Override
@@ -380,6 +383,9 @@ public class ArabicIndexer extends JFrame
 			final Properties prop = new Properties();
 			prop.load(new FileInputStream(ArabicIndexer.programFolder + "setting/setting.properties"));
 			defaultLanguage = prop.getProperty("language");
+
+			version = prop.getProperty("version");
+			biuf_version = prop.getProperty("biuf_version");
 
 			if (defaultLanguage.equals("nothing"))
 				new DefaultLanguage(ArabicIndexer.this);
@@ -1890,7 +1896,7 @@ public class ArabicIndexer extends JFrame
 								{
 									final OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(programFolder + "temp/info"), StandardCharsets.UTF_8);
 									out.write(titleTextField.getText().trim() + System.lineSeparator());
-									out.write(StreamConverter(programFolder + "setting/version.txt")[1] + System.lineSeparator()); // Version 1.6
+									out.write(biuf_version + System.lineSeparator()); // Version 1.6
 									out.write(descriptionTextArea.getText());
 									out.close();
 
@@ -5059,7 +5065,7 @@ public class ArabicIndexer extends JFrame
 							//Runtime.getRuntime().exec(new String []{new File("bin/SumatraPDF.exe").getAbsolutePath(), "-page", page, path}); // Version 1.6, Replace Foxit with SumatraPDF
 
 							// Version 1.7
-							final Process proc = Runtime.getRuntime().exec(new String[]{new File(programFolder + "bin/SumatraPDF.exe").getAbsolutePath(), "-page", page, path}); // Version 1.6, Replace Foxit with SumatraPDF
+							final Process proc = Runtime.getRuntime().exec(new String[]{new File(programFolder + "bin/SumatraPDF.exe").getAbsolutePath(), "-reuse-instance", "-page", page, path}); // Version 1.6, Replace Foxit with SumatraPDF
 
 							// Capture the Error/Output streams from the SumatraPDF process
 							class StreamGrabber extends Thread
@@ -5591,6 +5597,7 @@ public class ArabicIndexer extends JFrame
 					author.add(new DefaultMutableTreeNode(new NodeInfo(name, "", path, category, authorName, absolutePath, id)));
 					searchAuthor.add(new DefaultMutableTreeNode(new NodeInfo(name, "", path, category, authorName, absolutePath, id)));
 				}
+				rs2.close();
 
 				// Adding books which are more than one volume.
 				rs2 = stmt2.executeQuery("SELECT parent, category FROM " + bookTableName + " WHERE (author = '" + authorName + "' AND parent != '') GROUP BY parent, category"); // Version 1.7, GROUP BY should be with the same columns in SELECT

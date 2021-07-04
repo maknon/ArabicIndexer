@@ -162,7 +162,7 @@ public final class Ocr extends JDialog
 
 															final OutputStreamWriter out1 = new OutputStreamWriter(new FileOutputStream(ArabicIndexer.programFolder + "temp/info"), StandardCharsets.UTF_8);
 															out1.write(bookName + System.lineSeparator());
-															out1.write(ArabicIndexer.StreamConverter(ArabicIndexer.programFolder + "setting/version.txt")[1] + System.lineSeparator());
+															out1.write(ArabicIndexer.biuf_version + System.lineSeparator());
 															out1.write(translation[4] + author + System.lineSeparator() + translation[6] + category); // book betakah, for now it is author name + category
 															out1.close();
 
@@ -321,7 +321,7 @@ public final class Ocr extends JDialog
 
 														final OutputStreamWriter out1 = new OutputStreamWriter(new FileOutputStream(ArabicIndexer.programFolder + "temp/info"), StandardCharsets.UTF_8);
 														out1.write(bookName + System.lineSeparator());
-														out1.write(ArabicIndexer.StreamConverter(ArabicIndexer.programFolder + "setting/version.txt")[1] + System.lineSeparator());
+														out1.write(ArabicIndexer.biuf_version + System.lineSeparator());
 														out1.write(translation[4] + author +
 																System.lineSeparator() + translation[6] + category +
 																System.lineSeparator() + translation[7] + listOfSubBooks.length); // book betakah, for now it is author name + category

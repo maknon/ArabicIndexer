@@ -1,7 +1,10 @@
 package com.maknoon;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.sql.*;
+import java.util.Collection;
 import java.util.Vector;
 
 public class ShamelaWithPdf_test
@@ -24,6 +27,16 @@ public class ShamelaWithPdf_test
 
 	public ShamelaWithPdf_test() throws Exception
 	{
+		// Collect all pdf files path
+		final Collection<File> pdfFiles = FileUtils.listFiles(
+				new File(pdfPath),
+				new String[]{"pdf"},
+				true
+		);
+		final Vector<String> pdfPaths = new Vector<>(pdfFiles.size());
+		for (File f : pdfFiles)
+			pdfPaths.add(f.getAbsolutePath());
+
 		final Vector<String> oNum_oPdf = new Vector<>(5000, 500);
 		final Vector<String> BkId_0pdf = new Vector<>(5000, 500);
 		final Vector<String> PdfPath_oPdf = new Vector<>(5000, 500);
@@ -32,10 +45,50 @@ public class ShamelaWithPdf_test
 		final Connection conPDF = DriverManager.getConnection("jdbc:ucanaccess://" + pdfDB + ";memory=false;singleconnection=true");
 		final Statement stmtPDF = conPDF.createStatement();
 
+		final Vector<String> dbPdfPaths = new Vector<>(15000);
+		ResultSet rsPDF1 = stmtPDF.executeQuery("SELECT * FROM oPdf");
+		while (rsPDF1.next())
+		{
+			final String pdf = rsPDF1.getString("PdfPath");
+			final String path = pdf.replaceFirst("Rel:pdf", pdfPath);
+			dbPdfPaths.add(new File(path).getCanonicalPath());
+		}
+		rsPDF1.close();
+		rsPDF1 = stmtPDF.executeQuery("SELECT * FROM 0pdf");
+		while (rsPDF1.next())
+		{
+			final String pdf = rsPDF1.getString("PdfPath");
+			final String path = pdf.replaceFirst("Rel:pdf", pdfPath);
+			dbPdfPaths.add(new File(path).getCanonicalPath());
+		}
+		rsPDF1.close();
+		stmtPDF.close();
+		conPDF.close();
+
+		// Display the pdf files that has no entries in the DB
+		for (String s : pdfPaths)
+		{
+			boolean found = false;
+			for (String j : dbPdfPaths)
+			{
+				if(s.equals(j))
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(!found)
+				System.out.println(s + System.lineSeparator());
+		}
+
+		if(true)
+			return;
+
 		System.out.println("oPdf" + System.lineSeparator());
 
 		// TEST 1: Check if Paths are valid and has PDF files
-		ResultSet rsPDF = stmtPDF.executeQuery("SELECT * FROM oPdf");
+		final ResultSet rsPDF = stmtPDF.executeQuery("SELECT * FROM oPdf");
 		while (rsPDF.next())
 		{
 			final String pdf = rsPDF.getString("PdfPath");
@@ -53,21 +106,21 @@ public class ShamelaWithPdf_test
 
 		System.out.println("0pdf" + System.lineSeparator());
 
-		rsPDF = stmtPDF.executeQuery("SELECT * FROM 0pdf");
-		while (rsPDF.next())
+		final ResultSet rsPDF2 = stmtPDF.executeQuery("SELECT * FROM 0pdf");
+		while (rsPDF2.next())
 		{
-			final String pdf = rsPDF.getString("PdfPath");
+			final String pdf = rsPDF2.getString("PdfPath");
 			final String path = pdf.replaceFirst("Rel:pdf", pdfPath);
 
 			if (!new File(path).exists())
-				System.out.println(rsPDF.getString("BkId") + " " + pdf + System.lineSeparator());
+				System.out.println(rsPDF2.getString("BkId") + " " + pdf + System.lineSeparator());
 			else
 			{
-				BkId_0pdf.add(rsPDF.getString("BkId"));
+				BkId_0pdf.add(rsPDF2.getString("BkId"));
 				PdfPath_0pdf.add(pdf);
 			}
 		}
-		rsPDF.close();
+		rsPDF2.close();
 
 		final Thread[] threads = new Thread[4];
 		for (int k = 0; k < threads.length; k++)

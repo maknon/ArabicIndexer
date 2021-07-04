@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Build" basedir="." default="win_exe">
+<project name="Build" basedir="." default="win_exe"> <!-- mac target should be invoked from Intellij ant (not from cmd) since the arabic folder will be correct -->
 
 	<property name="build.dir"				value="build"/>
 	<property name="app.name"				value="مفهرس المخطوطات"/>
@@ -7,8 +7,8 @@
 	<property name="makensis.exe"			value="${tools.dir}\nsis\makensis.exe"/>
 	<property name="launch4j.jar"			value="${tools.dir}\launch4j\launch4j.jar"/>
 	<property name="ResourceHacker.exe"		value="${tools.dir}\Resource Hacker\ResourceHacker.exe"/>
-	<property name="jdk.linux"				value="openjdk-15_linux-x64_bin.tar.gz"/>
-	<property name="jdk.mac"				value="openjdk-15_osx-x64_bin.tar.gz"/>
+	<property name="jdk.linux"				value="openjdk-16_linux-x64_bin.tar.gz"/>
+	<property name="jdk.mac"				value="openjdk-16_osx-x64_bin.tar.gz"/>
 	<property name="jdk.win"				value="openjdk-15_windows-x64_bin.zip"/> <!-- www.bell-sw.com -->
 	<property name="java.old"				value="C:\Users\Ebrahim\Desktop\zulu8.46.0.19-ca-jdk8.0.252-win_x64\bin\java"/>
 
@@ -61,7 +61,20 @@
 			   srcdir="${build.dir}/src"
 			   destdir="${build.dir}"
 			   encoding="UTF-8"
-			   classpathref="class.path"/>
+			   classpathref="class.path"
+			   source="15"
+			   target="15">
+			<exclude name="com/maknoon/ShamelaWithPdf.java"/>
+			<exclude name="com/maknoon/ShamelaWithPdf_test.java"/>
+			<exclude name="com/maknoon/Shamela4WithPdf.java"/>
+			<exclude name="com/maknoon/TestElastic.java"/>
+			<exclude name="com/maknoon/GoogleTTS.java"/>
+			<exclude name="com/maknoon/GS.java"/>
+			<exclude name="com/maknoon/Thesaurus.java"/>
+			<exclude name="com/maknoon/WebLaFTest.java"/>
+			<exclude name="com/maknoon/OnlineConverter.java"/>
+			<exclude name="com/maknoon/ArabicRootIndexing.java"/>
+		</javac>
 	</target>
 
 	<path id="build-classpath">
@@ -109,14 +122,13 @@
 	</target>
 
 	<target name="launch4j">
-
 		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
 			<arg value="/c"/>
-			<arg value='"${java.old}" -Dfile.encoding=windows-1256 -jar "${launch4j.jar}" arabicindexer.xml'/>
+			<arg value='"${java.old}" -Dfile.encoding=windows-1252 -jar "${launch4j.jar}" arabicindexer.xml'/>
 		</exec>
 		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
 			<arg value="/c"/>
-			<arg value='"${java.old}" -Dfile.encoding=windows-1256 -jar "${launch4j.jar}" launcher.xml'/>
+			<arg value='"${java.old}" -Dfile.encoding=windows-1252 -jar "${launch4j.jar}" launcher.xml'/>
 		</exec>
 
 		<!-- launch4j is not working with jdk newer than 1.8

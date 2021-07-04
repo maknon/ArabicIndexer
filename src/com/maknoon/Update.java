@@ -8,11 +8,6 @@ package com.maknoon;
  * Line 1: Short description
  * Line 2: Exported DB version
  * Next Lines are details of the package
- *
- * version.txt
- *
- * Line 1: System version.
- * Line 2: DB min version to accept. This is useful when e.g. import DB version 1.5 from an updated version of the system (1.6 that is updated from 1.5)
  */
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +23,8 @@ import javax.swing.filechooser.*;
 import java.sql.*;
 import java.nio.channels.*;
 
-class Update extends JDialog
+class
+Update extends JDialog
 {
 	private final float currentSystemVersion, currentDBVersion;
 
@@ -61,8 +57,8 @@ class Update extends JDialog
 		final JLabel updateLabel = new JLabel(" ", ArabicIndexer.language == ArabicIndexer.lang.English ? SwingConstants.LEFT : SwingConstants.RIGHT);
 		mainPanel.add(updateLabel, BorderLayout.NORTH);
 
-		currentSystemVersion = Float.parseFloat(ArabicIndexer.StreamConverter(ArabicIndexer.programFolder + "setting/version.txt")[0]);
-		currentDBVersion = Float.parseFloat(ArabicIndexer.StreamConverter(ArabicIndexer.programFolder + "setting/version.txt")[1]);
+		currentSystemVersion = Float.parseFloat(ArabicIndexer.version);
+		currentDBVersion = Float.parseFloat(ArabicIndexer.biuf_version);
 
 		final Vector<UpdatesData> updateDataVector = new Vector<>();
 		final Vector<String> updateDescriptionVector = new Vector<>();
@@ -231,9 +227,9 @@ class Update extends JDialog
 						{
 							// i.e. biuf files
 							final ZipFile zipFile = new ZipFile(element);
-							for (Enumeration en = zipFile.entries(); en.hasMoreElements(); )
+							for (Enumeration<? extends ZipEntry> en = zipFile.entries(); en.hasMoreElements(); )
 							{
-								final ZipEntry zipEntry = (ZipEntry) en.nextElement();
+								final ZipEntry zipEntry = en.nextElement();
 								if (zipEntry.getName().equals("info"))
 								{
 									// Use BufferedReader to get one line at a time
@@ -396,16 +392,16 @@ class Update extends JDialog
 											outStream.write(buffer, 0, nrBytesRead);
 										outStream.close();
 
-											/*
-											int count;
-											final FileOutputStream fos = new FileOutputStream("temp/"+zippedFileName);
-											final BufferedOutputStream dest = new BufferedOutputStream(fos, 2048);
-								            while((count = zis.read(buffer, 0, 2048)) != -1)
-								               dest.write(buffer, 0, count);
+										/*
+										int count;
+										final FileOutputStream fos = new FileOutputStream("temp/"+zippedFileName);
+										final BufferedOutputStream dest = new BufferedOutputStream(fos, 2048);
+										while((count = zis.read(buffer, 0, 2048)) != -1)
+										   dest.write(buffer, 0, count);
 
-								            dest.close();
-								            fos.close();
-								            */
+										dest.close();
+										fos.close();
+										*/
 									}
 									inStream.close();
 
@@ -565,16 +561,22 @@ class Update extends JDialog
 
 						// Version 1.3, Clear the temp folder
 						final File[] deletedFiles = new File(ArabicIndexer.programFolder + "temp/").listFiles(); // Version 1.5
-						for (File e : deletedFiles)
+						if(deletedFiles != null)
 						{
-							// Version 1.3, Deleting folders.
-							if (e.isDirectory())
+							for (File e : deletedFiles)
 							{
-								final File[] folderFiles = e.listFiles();
-								for (File f : folderFiles)
-									f.delete();
+								// Version 1.3, Deleting folders.
+								if (e.isDirectory())
+								{
+									final File[] folderFiles = e.listFiles();
+									if(folderFiles != null)
+									{
+										for (File f : folderFiles)
+											f.delete();
+									}
+								}
+								e.delete();
 							}
-							e.delete();
 						}
 
 						/*

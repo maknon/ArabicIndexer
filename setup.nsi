@@ -58,12 +58,12 @@ InstallDirRegKey HKLM "Software\${PROGRAM_NAME}" "Install_Dir"
 !insertmacro MUI_LANGUAGE "Arabic"
 !insertmacro MUI_LANGUAGE "English"
 
-LangString WELCOME_TEXT ${LANG_ENGLISH} "Al Salaam Alaikum$\r$\n\
+LangString WELCOME_TEXT ${LANG_ENGLISH} "Al Salam Alaikum$\r$\n\
 $\r$\n\
 The program is useful to index PDF files, search within these files and displaying the exact pages.$\r$\n\
 $\r$\n\
 This product is licensed to all Muslims$\r$\n\
-Copyright©2020 Maknoon.com$\r$\n\
+Copyright©2021 Maknoon.com$\r$\n\
 This product is not for sale$\r$\n\
 Version 2.1"
 LangString WELCOME_TEXT ${LANG_ARABIC} "السلام عليكم ورحمة الله وبركاته$\r$\n\
@@ -86,7 +86,7 @@ LangString PUBLISHER_NAME ${LANG_ENGLISH} "Maknoon Apps"
 LangString PUBLISHER_NAME ${LANG_ARABIC} "برامج مكنون"
 
 LangString SHORTCUT_START ${LANG_ENGLISH} "Manuscripts Indexer"
-LangString SHORTCUT_START ${LANG_ARABIC} "مفهرس المخطوطات"
+LangString SHORTCUT_START ${LANG_ARABIC} "${CONVENIENT_NAME}"
 
 LangString INSTALLER_NAME ${LANG_ENGLISH} "${PROGRAM_NAME}"
 LangString INSTALLER_NAME ${LANG_ARABIC} "${CONVENIENT_NAME}"
@@ -205,7 +205,6 @@ Section "${PROGRAM_NAME}" SEC_IDX
 	File "ArabicIndexer.jar"
 	File "startup.bat"
 	File "ArabicIndexer.l4j.ini"
-	File "DBCompact.bat"
 	File "DBDefrag.bat"
 	File "DBEmpty.bat"
 	File "Launcher.exe"

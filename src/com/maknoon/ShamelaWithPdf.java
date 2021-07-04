@@ -25,7 +25,7 @@ public class ShamelaWithPdf
 			//System.setProperty("hsqldb.reconfig_logging", "false");
 			//Logger.getLogger("hsqldb.db").setLevel(Level.OFF);
 
-			final Logger databaseLogger = Logger.getLogger("hsqldb.db");
+			final Logger databaseLogger = Logger.getLogger("shamela.log");
 			databaseLogger.setUseParentHandlers(false);
 			databaseLogger.setLevel(Level.WARNING);
 			databaseLogger.addHandler(new FileHandler("shamela.log"));
@@ -38,9 +38,22 @@ public class ShamelaWithPdf
 		}
 	}
 
+	String biuf_version;
 	public ShamelaWithPdf() throws Exception
 	{
 		final String[] translation = ArabicIndexer.StreamConverter("language/ShamelaConvertor.txt");
+
+		final String programFolder = new File(ShamelaWithPdf.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath() + File.separator;
+		try
+		{
+			final Properties prop = new Properties();
+			prop.load(new FileInputStream(programFolder + "setting/setting.properties"));
+			biuf_version = prop.getProperty("biuf_version");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 
 		final Connection conPDF = DriverManager.getConnection("jdbc:ucanaccess://" + pdfDB + ";memory=false;singleconnection=true");
 		final Statement stmtPDF = conPDF.createStatement();
@@ -243,7 +256,7 @@ public class ShamelaWithPdf
 
 									final OutputStreamWriter out1 = new OutputStreamWriter(new FileOutputStream(new File(tempDir.toFile(), "info")), StandardCharsets.UTF_8);
 									out1.write(bookName + System.lineSeparator());
-									out1.write(ArabicIndexer.StreamConverter("setting/version.txt")[1] + System.lineSeparator());
+									out1.write(biuf_version + System.lineSeparator());
 									//out1.write(new String(rs1.getString("Betaka").getBytes(), "cp1256")); // can be done like: new String(rs.getBytes("Betaka"), "cp1256") since it is the only one that works with Quran DB !
 									out1.write(rs1.getString("Betaka"));
 									out1.close();

@@ -156,7 +156,7 @@ public class ShamelaConverter extends JDialog
 
 										final OutputStreamWriter out1 = new OutputStreamWriter(new FileOutputStream(ArabicIndexer.programFolder + "temp/info"), StandardCharsets.UTF_8);
 										out1.write(bookName + System.lineSeparator());
-										out1.write(ArabicIndexer.StreamConverter(ArabicIndexer.programFolder + "setting/version.txt")[1] + System.lineSeparator());
+										out1.write(ArabicIndexer.biuf_version + System.lineSeparator());
 										//out1.write(new String(rs1.getString("Betaka").getBytes(), "cp1256")); // can be done like: new String(rs.getBytes("Betaka"), "cp1256") since it is the only one that works with Quran DB !
 										out1.write(rs1.getString("Betaka"));
 										out1.close();

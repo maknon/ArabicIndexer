@@ -146,5 +146,5 @@ About
 It is forbidden to use this program in violation of the curriculum of the Sunnah
 This program is licensed to all Muslims
 This program is not for sale
-Copyright © 2020, Maknoon.com
-Version 2.0
+Copyright © 2021, Maknoon.com
+Version 2.1

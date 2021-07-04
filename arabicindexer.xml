@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="windows-1256"?>
+<?xml version="1.0" encoding="windows-1252"?>
 <launch4jConfig>
     <dontWrapJar>true</dontWrapJar>
     <headerType>gui</headerType>
@@ -20,13 +20,13 @@
     <versionInfo>
         <fileVersion>2.1.0.0</fileVersion>
         <txtFileVersion>2.1</txtFileVersion>
-        <fileDescription>Manuscripts Indexer Launcher</fileDescription>
+        <fileDescription>برنامج مفهرس المخطوطات</fileDescription>
         <copyright>©2021 Maknoon Apps</copyright>
         <productVersion>2.1.0.0</productVersion>
         <txtProductVersion>2.1</txtProductVersion>
-        <productName>Manuscripts Indexer</productName>
-        <companyName>Maknoon Apps</companyName>
-        <internalName>Maknoon Manuscripts Indexer</internalName>
+        <productName>مفهرس المخطوطات</productName>
+        <companyName>برامج مكنون</companyName>
+        <internalName>مفهرس المخطوطات</internalName>
         <originalFilename>ArabicIndexer.exe</originalFilename>
         <language>ARABIC</language>
     </versionInfo>
