@@ -28,7 +28,8 @@ Unicode true
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${HOME}\images.nsis\nsis.bmp"
 
 !define PROGRAM_NAME "Maknoon Manuscripts Indexer"
-!define CONVENIENT_NAME "مفهرس المخطوطات"
+!define PROGRAM_NAME_AR "مفهرس المخطوطات"
+!define MAKNOON_APPS "برامج مكنون"
 
 OutFile "ArabicIndexerVMx64.exe"
 
@@ -43,8 +44,8 @@ InstallDirRegKey HKLM "Software\${PROGRAM_NAME}" "Install_Dir"
 ;--------------------------------
 ;Pages
 
-!define MUI_WELCOMEPAGE_TITLE $(WELCOME_TITLE)
-!define MUI_WELCOMEPAGE_TEXT $(WELCOME_TEXT)
+!define MUI_WELCOMEPAGE_TITLE "$(WELCOME_TITLE)"
+!define MUI_WELCOMEPAGE_TEXT "$(WELCOME_TEXT)"
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
@@ -77,7 +78,7 @@ $\r$\n\
 الإصدار 2.1"
 
 LangString WELCOME_TITLE ${LANG_ENGLISH} "${PROGRAM_NAME}"
-LangString WELCOME_TITLE ${LANG_ARABIC} "${CONVENIENT_NAME}"
+LangString WELCOME_TITLE ${LANG_ARABIC} "${PROGRAM_NAME_AR}"
 
 LangString BOOK_FORMAT_DESCRIPTION ${LANG_ENGLISH} "Books Indexer Update File"
 LangString BOOK_FORMAT_DESCRIPTION ${LANG_ARABIC} "ملف بيانات مفهرس المخطوطات"
@@ -86,10 +87,10 @@ LangString PUBLISHER_NAME ${LANG_ENGLISH} "Maknoon Apps"
 LangString PUBLISHER_NAME ${LANG_ARABIC} "برامج مكنون"
 
 LangString SHORTCUT_START ${LANG_ENGLISH} "Manuscripts Indexer"
-LangString SHORTCUT_START ${LANG_ARABIC} "${CONVENIENT_NAME}"
+LangString SHORTCUT_START ${LANG_ARABIC} "${PROGRAM_NAME_AR}"
 
 LangString INSTALLER_NAME ${LANG_ENGLISH} "${PROGRAM_NAME}"
-LangString INSTALLER_NAME ${LANG_ARABIC} "${CONVENIENT_NAME}"
+LangString INSTALLER_NAME ${LANG_ARABIC} "${PROGRAM_NAME_AR}"
 
 Function .onInit
 
@@ -143,13 +144,13 @@ Function .onInit
 FunctionEnd
 
 ; The name of the installer
-Name $(INSTALLER_NAME)
-BrandingText $(INSTALLER_NAME)
+Name "$(INSTALLER_NAME)"
+BrandingText "$(INSTALLER_NAME)"
 VIProductVersion "2.1.0.0"
-VIAddVersionKey "ProductName" "${CONVENIENT_NAME}"
-VIAddVersionKey "CompanyName" "${PUBLISHER_NAME}"
+VIAddVersionKey "ProductName" "${PROGRAM_NAME_AR}"
+VIAddVersionKey "CompanyName" "${MAKNOON_APPS}"
 VIAddVersionKey "LegalCopyright" "©maknoon.com"
-VIAddVersionKey "FileDescription" "${CONVENIENT_NAME}"
+VIAddVersionKey "FileDescription" "${PROGRAM_NAME_AR}"
 VIAddVersionKey "FileVersion" "2.1"
 VIAddVersionKey "InternalName" "${PROGRAM_NAME}"
 
@@ -213,7 +214,7 @@ Section "${PROGRAM_NAME}" SEC_IDX
 	;File "derby.properties"	; When derby is in use
 
 	SetRegView 64 ; To solve the issue with icons on x64
-	${registerExtension} "$INSTDIR\Launcher.exe" ".biuf" $(BOOK_FORMAT_DESCRIPTION) 1
+	${registerExtension} "$INSTDIR\Launcher.exe" ".biuf" "$(BOOK_FORMAT_DESCRIPTION)" 1
 	${RefreshShellIcons}
 	SetRegView 32
 	
@@ -235,11 +236,11 @@ Section "${PROGRAM_NAME}" SEC_IDX
 	WriteRegStr HKLM "SOFTWARE\${PROGRAM_NAME}" "Lang" "$LANGUAGE"
 
 	; Write the uninstall keys for Windows
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayName" $(INSTALLER_NAME)
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "URLInfoAbout" "http://www.maknoon.com"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayName" "$(INSTALLER_NAME)"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "URLInfoAbout" "https://www.maknoon.com"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayIcon" "$INSTDIR\ArabicIndexer.exe,0"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "DisplayVersion" "2.1"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Publisher" $(PUBLISHER_NAME)
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "Publisher" "$(PUBLISHER_NAME)"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "UninstallString" '"$INSTDIR\uninstall.exe"'
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "NoModify" 1
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PROGRAM_NAME}" "NoRepair" 1
@@ -269,11 +270,11 @@ Section "Uninstall"
 
 	; Remove shortcut/directories used
 	Delete "$DESKTOP\$(SHORTCUT_START).lnk"
-	RMDir /r "$SMPROGRAMS\$(SHORTCUT_START).lnk"
+	Delete "$SMPROGRAMS\$(SHORTCUT_START).lnk"
 	RMDir /r "$INSTDIR"
 
 	SetRegView 64 ; To solve the issue with icons on x64
-	${unregisterExtension} ".biuf" $(BOOK_FORMAT_DESCRIPTION)
+	${unregisterExtension} ".biuf" "$(BOOK_FORMAT_DESCRIPTION)"
 	${un.RefreshShellIcons}
 	SetRegView 32
 	
