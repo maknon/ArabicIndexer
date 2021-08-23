@@ -52,12 +52,12 @@
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>kernel</artifactId>
-			<version>7.1.15</version>
+			<version>7.1.16</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.tess4j</groupId>
 			<artifactId>tess4j</artifactId>
-			<version>4.5.4</version>
+			<version>4.5.5</version>
 		</dependency>
 	</dependencies>
 

@@ -33,6 +33,7 @@ import com.alee.laf.WebLookAndFeel;
 import com.alee.laf.checkbox.CheckState;
 import com.alee.laf.menu.WebPopupMenu;
 
+import com.alee.managers.icon.IconManager;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import org.apache.lucene.analysis.*;
@@ -133,6 +134,9 @@ public class ArabicIndexer extends JFrame
 
 	static String version;
 	static String biuf_version;
+	static boolean biuf_compression;
+	static boolean large_icons;
+	static String imageFolder;
 
 	final CheckStateChangeListener<DefaultMutableTreeNode> authorSearchTreeChangeListener = new CheckStateChangeListener<>()
 	{
@@ -381,11 +385,14 @@ public class ArabicIndexer extends JFrame
 			// Determine the default language
 			// Update version 2.1
 			final Properties prop = new Properties();
-			prop.load(new FileInputStream(ArabicIndexer.programFolder + "setting/setting.properties"));
+			prop.load(new FileInputStream(programFolder + "setting/setting.properties"));
 			defaultLanguage = prop.getProperty("language");
 
 			version = prop.getProperty("version");
 			biuf_version = prop.getProperty("biuf_version");
+
+			biuf_compression = prop.getProperty("biuf_compression").equals("true");
+			large_icons = prop.getProperty("large_icons").equals("true");
 
 			if (defaultLanguage.equals("nothing"))
 				new DefaultLanguage(ArabicIndexer.this);
@@ -396,6 +403,14 @@ public class ArabicIndexer extends JFrame
 		{
 			e.printStackTrace();
 		}
+
+		if(large_icons)
+		{
+			IconManager.addIconSet ( new LargIconSet() );
+			imageFolder = "images/largeSet/";
+		}
+		else
+			imageFolder = "images/";
 
 		WebLookAndFeel.setLeftToRightOrientation(language == lang.English);
 
@@ -507,7 +522,7 @@ public class ArabicIndexer extends JFrame
 				add(new JMenu(translations[138]) // File
 				{
 					{
-						importMenuItem = new JMenuItem(translations[139], new ImageIcon(programFolder + "images/import.png"));
+						importMenuItem = new JMenuItem(translations[139], new ImageIcon(programFolder + imageFolder + "import.png"));
 						importMenuItem.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
@@ -517,7 +532,7 @@ public class ArabicIndexer extends JFrame
 						});
 						add(importMenuItem);
 
-						add(new JMenuItem(translations[140], new ImageIcon(programFolder + "images/languages.png"))
+						add(new JMenuItem(translations[140], new ImageIcon(programFolder + imageFolder + "languages.png"))
 						{
 							{
 								addActionListener(new ActionListener()
@@ -531,7 +546,7 @@ public class ArabicIndexer extends JFrame
 						});
 
 						// Version 1.8, Shamela Converter
-						add(new JMenuItem(translations[116], new ImageIcon(programFolder + "images/convertor_icon.png"))
+						add(new JMenuItem(translations[116], new ImageIcon(programFolder + imageFolder + "convertor_icon.png"))
 						{
 							{
 								addActionListener(new ActionListener()
@@ -544,7 +559,7 @@ public class ArabicIndexer extends JFrame
 							}
 						});
 
-						add(new JMenuItem(translations[32], new ImageIcon(programFolder + "images/ocr.png"))
+						add(new JMenuItem(translations[32], new ImageIcon(programFolder + imageFolder + "ocr.png"))
 						{
 							{
 								addActionListener(new ActionListener()
@@ -577,7 +592,7 @@ public class ArabicIndexer extends JFrame
 				add(new JMenu(translations[142]) // Help
 				{
 					{
-						add(new JMenuItem(translations[143], new ImageIcon(programFolder + "images/help.png"))
+						add(new JMenuItem(translations[143], new ImageIcon(programFolder + imageFolder + "help.png"))
 						{
 							{
 								addActionListener(new ActionListener()
@@ -597,7 +612,7 @@ public class ArabicIndexer extends JFrame
 							}
 						});
 
-						add(new JMenuItem(translations[144], new ImageIcon(programFolder + "images/about.png"))
+						add(new JMenuItem(translations[144], new ImageIcon(programFolder + imageFolder + "about.png"))
 						{
 							{
 								addActionListener(new ActionListener()
@@ -663,13 +678,13 @@ public class ArabicIndexer extends JFrame
 				{
 					// Is Root Leaf ?
 					if (node.isRoot())
-						setIcon(new ImageIcon(programFolder + "images/rootLeaf.png"));
+						setIcon(new ImageIcon(programFolder + imageFolder + "rootLeaf.png"));
 					else
 					{
-						if (nodeInfo.path.endsWith("pdf"))
-							setIcon(new ImageIcon(programFolder + "images/PDF.png"));
+						if (nodeInfo.path.toLowerCase().endsWith("pdf"))
+							setIcon(new ImageIcon(programFolder + imageFolder + "PDF.png"));
 						else
-							setIcon(new ImageIcon(programFolder + "images/icon.png"));
+							setIcon(new ImageIcon(programFolder + imageFolder + "icon.png"));
 
 						// Version 1.7
 						setToolTipText("<HTML>" + (language != lang.English ? "<div align=right>" : "") + "<font color=red>" + translations[117] + ":</font> " + nodeInfo.absolutePath + "<br><font color=red>" + translations[7] + ":</font> " + nodeInfo.author + "<br><font color=red>" + translations[8] + ":</font> " + nodeInfo.category);
@@ -681,9 +696,9 @@ public class ArabicIndexer extends JFrame
 					{
 						// setClosedIcon, setOpenIcon will not work since they are used to all nodes.
 						//if(expanded)
-						setIcon(new ImageIcon(programFolder + "images/books.png"));
+						setIcon(new ImageIcon(programFolder + imageFolder + "books.png"));
 						//else
-						//	setIcon(new ImageIcon("images/book_close.png"));
+						//	setIcon(new ImageIcon("book_close.png"));
 						if (authorTreeSelected)
 							setToolTipText("<HTML><font color=red>" + translations[8] + ":</font> " + nodeInfo.category);
 						else
@@ -725,9 +740,9 @@ public class ArabicIndexer extends JFrame
 		final JPanel searchPanel = new JPanel(new BorderLayout());
 		searchPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), translations[108], TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_JUSTIFICATION, null, Color.red));
 
-		final JButton addButton = new JButton(new ImageIcon(programFolder + "images/add.png"));
+		final JButton addButton = new JButton(new ImageIcon(programFolder + imageFolder + "add.png"));
 		addButton.setToolTipText(translations[99]);
-		final JMenuItem addMenuItem = new JMenuItem(translations[100], new ImageIcon(programFolder + "images/add.png"));
+		final JMenuItem addMenuItem = new JMenuItem(translations[100], new ImageIcon(programFolder + imageFolder + "add.png"));
 		final ActionListener AddActionListener = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -820,7 +835,7 @@ public class ArabicIndexer extends JFrame
 									table.setRowSelectionInterval(table.rowAtPoint(e.getPoint()), table.rowAtPoint(e.getPoint()));
 
 									final JPopupMenu tablePopup = new JPopupMenu();
-									final JMenuItem menuItem = new JMenuItem(translations[47] + (table.rowAtPoint(e.getPoint())+1), new ImageIcon("images/delete.png"));
+									final JMenuItem menuItem = new JMenuItem(translations[47] + (table.rowAtPoint(e.getPoint())+1), new ImageIcon("delete.png"));
 									menuItem.addActionListener(new ActionListener()
 									{
 										public void actionPerformed(ActionEvent ae)
@@ -889,7 +904,7 @@ public class ArabicIndexer extends JFrame
 						// Creating the JTable by passing the table model
 						addDialog.add(new JScrollPane(table), BorderLayout.CENTER);
 
-						final JButton browseButton = new JButton(translations[100], new ImageIcon(programFolder + "images/add.png"));
+						final JButton browseButton = new JButton(translations[100], new ImageIcon(programFolder + imageFolder + "add.png"));
 						browseButton.setToolTipText(translations[12]);
 						browseButton.addActionListener(new ActionListener()
 						{
@@ -927,7 +942,7 @@ public class ArabicIndexer extends JFrame
 										}
 
 										if (add)
-											resultsDataVector.addElement(new ResultsData(new ImageIcon(programFolder + (new File(element.toString()).isFile() ? "images/books.png" : "images/icon.png")), element.toString(), "", addType.equals("parent") ? bookName : "", ((addType.equals("leaf") || addType.equals("parent")) && authorTreeSelected) ? bookAuthor : "", ((addType.equals("leaf") || addType.equals("parent")) && !authorTreeSelected) ? bookCategory : "")); // Version 1.7
+											resultsDataVector.addElement(new ResultsData(new ImageIcon(programFolder + imageFolder + (new File(element.toString()).isFile() ? "books.png" : "icon.png")), element.toString(), "", addType.equals("parent") ? bookName : "", ((addType.equals("leaf") || addType.equals("parent")) && authorTreeSelected) ? bookAuthor : "", ((addType.equals("leaf") || addType.equals("parent")) && !authorTreeSelected) ? bookCategory : "")); // Version 1.7
 									}
 									table.updateUI();
 								}
@@ -935,7 +950,7 @@ public class ArabicIndexer extends JFrame
 						});
 
 						// Version 1.6
-						final JButton removeButton = new JButton(translations[102], new ImageIcon(programFolder + "images/cancel.png"));
+						final JButton removeButton = new JButton(translations[102], new ImageIcon(programFolder + imageFolder + "cancel.png"));
 						removeButton.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
@@ -946,7 +961,7 @@ public class ArabicIndexer extends JFrame
 							}
 						});
 
-						final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + "images/ok.png"));
+						final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + imageFolder + "ok.png"));
 						OKButton.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
@@ -1147,7 +1162,7 @@ public class ArabicIndexer extends JFrame
 												}
 
 												if(add)
-													resultsDataVector.addElement(new ResultsData(new ImageIcon(new File(addedBookPath).isFile()?"images/books.png":"images/icon.png"), addedBookPath, "", addType.equals("parent")?bookName:"", ((addType.equals("leaf") || addType.equals("parent")) && authorTreeSelected)?bookAuthor:"", ((addType.equals("leaf") || addType.equals("parent")) && !authorTreeSelected)?bookCategory:"")); // Version 1.7
+													resultsDataVector.addElement(new ResultsData(new ImageIcon(new File(addedBookPath).isFile()?"books.png":"icon.png"), addedBookPath, "", addType.equals("parent")?bookName:"", ((addType.equals("leaf") || addType.equals("parent")) && authorTreeSelected)?bookAuthor:"", ((addType.equals("leaf") || addType.equals("parent")) && !authorTreeSelected)?bookCategory:"")); // Version 1.7
 												table.updateUI();
 											}
 
@@ -1177,7 +1192,7 @@ public class ArabicIndexer extends JFrame
 													}
 
 													if(add)
-														resultsDataVector.addElement(new ResultsData(new ImageIcon(new File(addedBookPath).isFile()?"images/books.png":"images/icon.png"), addedBookPath, "", addType.equals("parent")?bookName:"", ((addType.equals("leaf") || addType.equals("parent")) && authorTreeSelected)?bookAuthor:"", ((addType.equals("leaf") || addType.equals("parent")) && !authorTreeSelected)?bookCategory:"")); // Version 1.7
+														resultsDataVector.addElement(new ResultsData(new ImageIcon(new File(addedBookPath).isFile()?"books.png":"icon.png"), addedBookPath, "", addType.equals("parent")?bookName:"", ((addType.equals("leaf") || addType.equals("parent")) && authorTreeSelected)?bookAuthor:"", ((addType.equals("leaf") || addType.equals("parent")) && !authorTreeSelected)?bookCategory:"")); // Version 1.7
 													table.updateUI();
 												}
 
@@ -1217,9 +1232,9 @@ public class ArabicIndexer extends JFrame
 		addButton.addActionListener(AddActionListener);
 		addMenuItem.addActionListener(AddActionListener);
 
-		final JButton editButton = new JButton(new ImageIcon(programFolder + "images/edit.png"));
+		final JButton editButton = new JButton(new ImageIcon(programFolder + imageFolder + "edit.png"));
 		editButton.setToolTipText(translations[101]);
-		final JMenuItem editMenuItem = new JMenuItem(translations[101], new ImageIcon(programFolder + "images/edit.png"));
+		final JMenuItem editMenuItem = new JMenuItem(translations[101], new ImageIcon(programFolder + imageFolder + "edit.png"));
 		final ActionListener EditActionListener = new ActionListener()
 		{
 			String selectedBookCategory = null;
@@ -1277,7 +1292,7 @@ public class ArabicIndexer extends JFrame
 										}
 									});
 
-									final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + "images/ok.png"));
+									final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + imageFolder + "ok.png"));
 									OKButton.addActionListener(new ActionListener()
 									{
 										public void actionPerformed(ActionEvent e)
@@ -1381,7 +1396,7 @@ public class ArabicIndexer extends JFrame
 											}
 										});
 
-										final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + "images/ok.png"));
+										final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + imageFolder + "ok.png"));
 										OKButton.addActionListener(new ActionListener()
 										{
 											public void actionPerformed(ActionEvent e)
@@ -1468,7 +1483,7 @@ public class ArabicIndexer extends JFrame
 											editDialog.setResizable(false);
 
 											final JTextField authorTextField = new JTextField(bookAuthor, 35);
-											final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + "images/ok.png"));
+											final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + imageFolder + "ok.png"));
 											OKButton.addActionListener(new ActionListener()
 											{
 												public void actionPerformed(ActionEvent e)
@@ -1532,7 +1547,7 @@ public class ArabicIndexer extends JFrame
 											editDialog.setResizable(false);
 
 											final JTextField categoryTextField = new JTextField(bookCategory, 35);
-											final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + "images/ok.png"));
+											final JButton OKButton = new JButton(translations[11], new ImageIcon(programFolder + imageFolder + "ok.png"));
 											OKButton.addActionListener(new ActionListener()
 											{
 												public void actionPerformed(ActionEvent e)
@@ -1601,9 +1616,9 @@ public class ArabicIndexer extends JFrame
 		editButton.addActionListener(EditActionListener);
 		editMenuItem.addActionListener(EditActionListener);
 
-		final JButton deleteButton = new JButton(new ImageIcon(programFolder + "images/cancel.png"));
+		final JButton deleteButton = new JButton(new ImageIcon(programFolder + imageFolder + "cancel.png"));
 		deleteButton.setToolTipText(translations[102]);
-		final JMenuItem deleteMenuItem = new JMenuItem(translations[102], new ImageIcon(programFolder + "images/cancel.png"));
+		final JMenuItem deleteMenuItem = new JMenuItem(translations[102], new ImageIcon(programFolder + imageFolder + "cancel.png"));
 		final ActionListener DeleteActionListener = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -1799,7 +1814,7 @@ public class ArabicIndexer extends JFrame
 		tree.addKeyListener(keyListener);
 		authorTree.addKeyListener(keyListener);
 
-		final JButton indexingButton = new JButton(new ImageIcon(programFolder + "images/indexing.png"));
+		final JButton indexingButton = new JButton(new ImageIcon(programFolder + imageFolder + "indexing.png"));
 		indexingButton.setToolTipText(translations[104]);
 
 		// Version 1.5
@@ -1829,7 +1844,7 @@ public class ArabicIndexer extends JFrame
 		}
 
 		final JMenu indexingMenu = new JMenu(translations[104]);
-		indexingMenu.setIcon(new ImageIcon(programFolder + "images/indexing.png"));
+		indexingMenu.setIcon(new ImageIcon(programFolder + imageFolder + "indexing.png"));
 		indexingMenu.add(treePopupIndexingMenuItem);
 		indexingMenu.add(treePopupRootsIndexingMenuItem);
 		indexingMenu.add(treePopupLuceneIndexingMenuItem);
@@ -1857,9 +1872,9 @@ public class ArabicIndexer extends JFrame
 			}
 		});
 
-		final JButton exportButton = new JButton(new ImageIcon(programFolder + "images/export.png"));
+		final JButton exportButton = new JButton(new ImageIcon(programFolder + imageFolder + "export.png"));
 		exportButton.setToolTipText(translations[105]);
-		final JMenuItem exportMenuItem = new JMenuItem(translations[106], new ImageIcon(programFolder + "images/export.png"));
+		final JMenuItem exportMenuItem = new JMenuItem(translations[106], new ImageIcon(programFolder + imageFolder + "export.png"));
 		final ActionListener ExportActionListener = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -2155,10 +2170,16 @@ public class ArabicIndexer extends JFrame
 														*/
 
 														// Create a buffer for reading the files.
-														final byte[] buf = new byte[1024];
+														final byte[] buf = new byte[1024*256]; // Version 2.2, *256 to speed the export
 
 														// Create the ZIP file
 														final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(pathName));
+
+														if(!biuf_compression)
+														{
+															out.setMethod(ZipOutputStream.DEFLATED);
+															out.setLevel(Deflater.NO_COMPRESSION);
+														}
 
 														// Adding 'arabicDatabase' or 'englishDatabase' to the zip file.
 														FileInputStream in = new FileInputStream(programFolder + "temp/" + bookTableName);
@@ -2249,7 +2270,7 @@ public class ArabicIndexer extends JFrame
 																		if(zipFilesList.add(absoluteFileNameVector.elementAt(i))) // Version 2.1, to avoid adding repeated pdf files. it will throw exception
 																		{
 																			in = new FileInputStream(path);
-																			out.putNextEntry(new ZipEntry(absoluteFileNameVector.elementAt(i)));
+																			out.putNextEntry(new ZipEntry(absoluteFileNameVector.elementAt(i))); //entry.setMethod(ZipEntry.STORED); //not working
 																			while ((len = in.read(buf)) > 0)
 																				out.write(buf, 0, len);
 																			out.closeEntry();
@@ -2957,14 +2978,14 @@ public class ArabicIndexer extends JFrame
 									while ((numChars = description.read(arr, 0, arr.length)) > 0)
 										buf.append(arr, 0, numChars);
 
-									setText(buf.toString(), "text/plain", programFolder + "images/save.png", translations[70]); // Version 1.7
+									setText(buf.toString(), "text/plain", programFolder + imageFolder + "save.png", translations[70]); // Version 1.7
 									displayEditTextPane.setCaretPosition(0);
 
 									pageTextField.setText(rs.getString("page"));
 									currentDisplayedPage = pageTextField.getText();
 								}
 								else
-									setText("<font color=red>خطأ، الملف لا يتضمن أية صفحة.\nيمكن أن يحدث هذا إن قمت بتحرير هذا الكتاب الذي قمت باستيراده بشكل يدوي وكان ملف الفهرسة فيه خاليا.</font>", "text/html", programFolder + "images/edit.png", translations[103]);
+									setText("<font color=red>خطأ، الملف لا يتضمن أية صفحة.\nيمكن أن يحدث هذا إن قمت بتحرير هذا الكتاب الذي قمت باستيراده بشكل يدوي وكان ملف الفهرسة فيه خاليا.</font>", "text/html", programFolder + imageFolder + "edit.png", translations[103]);
 
 								rs = stmt.executeQuery("SELECT MAX(Page) FROM b" + bookId); // There should be one page at least.
 								rs.next();
@@ -3114,7 +3135,7 @@ public class ArabicIndexer extends JFrame
 		authorTree.addMouseListener(mouseAdapter);
 
 		final JTextField listSearchTextField = new JTextField();
-		final JButton listSearchButton = new JButton(new ImageIcon(programFolder + "images/search.png"));
+		final JButton listSearchButton = new JButton(new ImageIcon(programFolder + imageFolder + "search.png"));
 		listSearchButton.setToolTipText(translations[107]);
 		final ActionListener listSearchActionListener = new ActionListener()
 		{
@@ -3360,7 +3381,7 @@ public class ArabicIndexer extends JFrame
 		centerInScreen(searchTreeDialog);
 
 		// Version 1.5
-		final JButton searchRangeButton = new JButton(new ImageIcon(programFolder + "images/search_range.png"));
+		final JButton searchRangeButton = new JButton(new ImageIcon(programFolder + imageFolder + "search_range.png"));
 		searchRangeButton.setToolTipText(translations[121]);
 		searchRangeButton.addActionListener(new ActionListener()
 		{
@@ -3399,7 +3420,7 @@ public class ArabicIndexer extends JFrame
 		if (language != lang.English)
 			searchOptionsPopupMenu.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
-		final JButton searchOptionsButton = new JButton(new ImageIcon(programFolder + "images/preferences.png"));
+		final JButton searchOptionsButton = new JButton(new ImageIcon(programFolder + imageFolder + "preferences.png"));
 		searchOptionsButton.setToolTipText(translations[122]);
 		searchOptionsButton.addActionListener(new ActionListener()
 		{
@@ -3419,7 +3440,7 @@ public class ArabicIndexer extends JFrame
 		searchOptionsPanel.add(searchOptionsButton);
 		searchOptionsPanel.add(searchRangeButton);
 
-		orderButton = new JButton(new ImageIcon(programFolder + "images/open.png"));
+		orderButton = new JButton(new ImageIcon(programFolder + imageFolder + "open.png"));
 		orderButton.setToolTipText(translations[97]);
 		orderButton.addActionListener(new ActionListener()
 		{
@@ -3491,7 +3512,7 @@ public class ArabicIndexer extends JFrame
 		listPanel.add(listOptionsPanel, BorderLayout.SOUTH);
 		//listPanel.setPreferredSize(listPanel.getPreferredSize()); // Version 1.5, To fix the width. Version 1.7, Removed after using JSplitPane
 
-		final JButton searchButton = new JButton(translations[109], new ImageIcon(programFolder + "images/search.png"));
+		final JButton searchButton = new JButton(translations[109], new ImageIcon(programFolder + imageFolder + "search.png"));
 		final ActionListener SearchActionListener = new ActionListener()
 		{
 			// Version 1.4
@@ -3523,7 +3544,7 @@ public class ArabicIndexer extends JFrame
 								// This variable is used to stop searching two items at the same time.
 								searchThreadWork = true;
 								searchTextField.setEnabled(false);
-								searchButton.setIcon(new ImageIcon(programFolder + "images/stop_search.png"));
+								searchButton.setIcon(new ImageIcon(programFolder + imageFolder + "stop_search.png"));
 								searchButton.setText(translations[73]);
 								searchPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), translations[108], TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_JUSTIFICATION, null, Color.red));
 
@@ -3869,7 +3890,7 @@ public class ArabicIndexer extends JFrame
 
 								searchThreadWork = false;
 								searchTextField.setEnabled(true);
-								searchButton.setIcon(new ImageIcon(programFolder + "images/search.png"));
+								searchButton.setIcon(new ImageIcon(programFolder + imageFolder + "search.png"));
 								searchButton.setText(translations[109]);
 							}
 						};
@@ -3976,15 +3997,15 @@ public class ArabicIndexer extends JFrame
 								if (text != null)
 								{
 									final Matcher m = CRLF.matcher(text);
-									setText(m.replaceAll("<br>"), "text/html", programFolder + "images/edit.png", translations[103]);
+									setText(m.replaceAll("<br>"), "text/html", programFolder + imageFolder + "edit.png", translations[103]);
 								}
 								else
-									setText(page, "text/plain", programFolder + "images/save.png", translations[70]);
+									setText(page, "text/plain", programFolder + imageFolder + "save.png", translations[70]);
 
 								displayEditTextPane.setCaretPosition(0);
 							}
 							else
-								setText("", "text/plain", programFolder + "images/save.png", translations[70]);
+								setText("", "text/plain", programFolder + imageFolder + "save.png", translations[70]);
 
 							pageTextField.setText(searchResultsPageVector.elementAt(searchResultSelectedIndex));
 							currentDisplayedPage = searchResultsPageVector.elementAt(searchResultSelectedIndex);
@@ -4190,7 +4211,7 @@ public class ArabicIndexer extends JFrame
 
 		//final Pattern CRLF = Pattern.compile("(\r\n|\n)");
 
-		forwardButton = new JButton(new ImageIcon(programFolder + (language != lang.English ? "images/forward.png" : "images/backward.png")));
+		forwardButton = new JButton(new ImageIcon(programFolder + imageFolder + (language != lang.English ? "forward.png" : "backward.png")));
 		forwardButton.setToolTipText(translations[77]);
 		forwardButton.addActionListener(new ActionListener()
 		{
@@ -4217,12 +4238,12 @@ public class ArabicIndexer extends JFrame
 
 							//final Matcher m = CRLF.matcher(rs.getString("content"));
 							//displayEditTextPane.setText(m.replaceAll("<br>"));
-							setText(buf.toString(), "text/plain", programFolder + "images/save.png", translations[70]); // Version 1.7
+							setText(buf.toString(), "text/plain", programFolder + imageFolder + "save.png", translations[70]); // Version 1.7
 							//displayEditTextPane.getDocument().putProperty(javax.swing.text.DefaultEditorKit.EndOfLineStringProperty, "<br>");
 							displayEditTextPane.setCaretPosition(0);
 						}
 						else
-							setText("", "text/plain", programFolder + "images/save.png", translations[70]);
+							setText("", "text/plain", programFolder + imageFolder + "save.png", translations[70]);
 
 						pageTextField.setText(String.valueOf(currentPage + 1));
 						currentDisplayedPage = pageTextField.getText();
@@ -4236,7 +4257,7 @@ public class ArabicIndexer extends JFrame
 			}
 		});
 
-		backButton = new JButton(new ImageIcon(programFolder + (language != lang.English ? "images/backward.png" : "images/forward.png")));
+		backButton = new JButton(new ImageIcon(programFolder + imageFolder + (language != lang.English ? "backward.png" : "forward.png")));
 		backButton.setToolTipText(translations[78]);
 		backButton.addActionListener(new ActionListener()
 		{
@@ -4261,11 +4282,11 @@ public class ArabicIndexer extends JFrame
 							while ((numChars = description.read(arr, 0, arr.length)) > 0)
 								buf.append(arr, 0, numChars);
 
-							setText(buf.toString(), "text/plain", programFolder + "images/save.png", translations[70]); // Version 1.7
+							setText(buf.toString(), "text/plain", programFolder + imageFolder + "save.png", translations[70]); // Version 1.7
 							displayEditTextPane.setCaretPosition(0);
 						}
 						else
-							setText("", "text/plain", programFolder + "images/save.png", translations[70]);
+							setText("", "text/plain", programFolder + imageFolder + "save.png", translations[70]);
 
 						pageTextField.setText(String.valueOf(currentPage - 1));
 						currentDisplayedPage = pageTextField.getText();
@@ -4279,7 +4300,7 @@ public class ArabicIndexer extends JFrame
 			}
 		});
 
-		saveButton = new JButton(new ImageIcon(programFolder + "images/save.png"));
+		saveButton = new JButton(new ImageIcon(programFolder + imageFolder + "save.png"));
 		saveButton.setToolTipText(translations[70]);
 		saveButton.addActionListener(new ActionListener()
 		{
@@ -4372,11 +4393,11 @@ public class ArabicIndexer extends JFrame
 							while ((numChars = description.read(arr, 0, arr.length)) > 0)
 								buf.append(arr, 0, numChars);
 
-							setText(buf.toString(), "text/plain", programFolder + "images/save.png", translations[70]); // Version 1.7
+							setText(buf.toString(), "text/plain", programFolder + imageFolder + "save.png", translations[70]); // Version 1.7
 							displayEditTextPane.setCaretPosition(0);
 						}
 						else
-							setText("", "text/plain", programFolder + "images/save.png", translations[70]);
+							setText("", "text/plain", programFolder + imageFolder + "save.png", translations[70]);
 						stmt.close();
 					}
 					catch (Exception ex)
@@ -4387,7 +4408,7 @@ public class ArabicIndexer extends JFrame
 			}
 		});
 
-		viewButton = new JButton(new ImageIcon(programFolder + "images/PDF.png"));
+		viewButton = new JButton(new ImageIcon(programFolder + imageFolder + "PDF.png"));
 		viewButton.setToolTipText(translations[72]);
 		viewButton.addActionListener(new ActionListener()
 		{
@@ -4448,11 +4469,11 @@ public class ArabicIndexer extends JFrame
 									while ((numChars = description.read(arr, 0, arr.length)) > 0)
 										buf.append(arr, 0, numChars);
 
-									setText(buf.toString(), "text/plain", programFolder + "images/save.png", translations[70]); // Version 1.7
+									setText(buf.toString(), "text/plain", programFolder + imageFolder + "save.png", translations[70]); // Version 1.7
 									displayEditTextPane.setCaretPosition(0);
 								}
 								else
-									setText("", "text/plain", programFolder + "images/save.png", translations[70]);
+									setText("", "text/plain", programFolder + imageFolder + "save.png", translations[70]);
 
 								currentDisplayedPage = pageTextField.getText();
 								stmt.close();
@@ -4957,7 +4978,7 @@ public class ArabicIndexer extends JFrame
 		forwardButton.setEnabled(enable);
 		pageTextField.setEditable(enable);
 
-		setText("", "text/plain", programFolder + "images/save.png", note);
+		setText("", "text/plain", programFolder + imageFolder + "save.png", note);
 		displayEditTextPane.setEditable(enable); // Version 1.7, moved here since setText() includes setEditable(true).
 		pageTextField.setText("");
 		pagesTextField.setText("");
@@ -5560,7 +5581,7 @@ public class ArabicIndexer extends JFrame
 					category.add(parent);
 					searchCategory.add(new DefaultMutableTreeNode(new NodeInfo(bookParent, "", "", categoryName, author, "", 0)));
 
-					final ResultSet rs3 = stmt3.executeQuery("SELECT * FROM " + bookTableName + " WHERE (category = '" + categoryName + "' AND parent = '" + bookParent + "' AND author = '" + author + "') ORDER BY name"); // Version 1.7, ... AND author = '"+author+"' ...
+					final ResultSet rs3 = stmt3.executeQuery("SELECT * FROM " + bookTableName + " WHERE (category = '" + categoryName + "' AND parent = '" + bookParent + "' AND author = '" + author + "') ORDER BY LENGTH(name), name"); // Version 1.7, ... AND author = '"+author+"' ...
 					while (rs3.next())
 					{
 						final String path = rs3.getString("path"); // Version 1.9
@@ -5610,7 +5631,7 @@ public class ArabicIndexer extends JFrame
 					author.add(parent);
 					searchAuthor.add(new DefaultMutableTreeNode(new NodeInfo(bookParent, "", /* Version 1.7 */"", category, authorName, "", 0)));
 
-					final ResultSet rs3 = stmt3.executeQuery("SELECT * FROM " + bookTableName + " WHERE (author = '" + authorName + "' AND parent = '" + bookParent + "' AND category = '" + category + "') ORDER BY name"); //Version 1.7, ... AND category = '"+category+"' ...
+					final ResultSet rs3 = stmt3.executeQuery("SELECT * FROM " + bookTableName + " WHERE (author = '" + authorName + "' AND parent = '" + bookParent + "' AND category = '" + category + "') ORDER BY LENGTH(name), name"); //Version 1.7, ... AND category = '"+category+"' ...
 					while (rs3.next())
 					{
 						final String path = rs3.getString("path"); // Version 1.9
@@ -5782,7 +5803,6 @@ public class ArabicIndexer extends JFrame
 				//LanguageManager.setDefaultLanguage(LanguageConstants.ARABIC);
 				WebLookAndFeel.setLeftToRightOrientation(false);
 				WebLookAndFeel.install();
-
 				new ArabicIndexer();
 			}
 		});

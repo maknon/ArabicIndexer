@@ -74,6 +74,9 @@
 			<exclude name="com/maknoon/WebLaFTest.java"/>
 			<exclude name="com/maknoon/OnlineConverter.java"/>
 			<exclude name="com/maknoon/ArabicRootIndexing.java"/>
+			<exclude name="com/maknoon/MoveShamelaV4Duplicates.java"/>
+			<exclude name="com/maknoon/OnlineConverterPostProcess.java"/>
+			<exclude name="com/maknoon/CompressOnline.java"/>
 		</javac>
 	</target>
 

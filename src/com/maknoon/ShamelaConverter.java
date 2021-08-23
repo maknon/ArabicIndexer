@@ -57,7 +57,7 @@ public class ShamelaConverter extends JDialog
 			e.printStackTrace();
 		}
 
-		final JButton browse = new JButton(translation[3], new ImageIcon(ArabicIndexer.programFolder + "images/open.png"));
+		final JButton browse = new JButton(translation[3], new ImageIcon(ArabicIndexer.programFolder + ArabicIndexer.imageFolder + "open.png"));
 		browse.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

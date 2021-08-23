@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="bin_X">
+    <output-path>$PROJECT_DIR$/out/ArabicIndexer/bin_X</output-path>
+    <root id="root">
+      <element id="directory" name="xpdf">
+        <element id="dir-copy" path="$PROJECT_DIR$/bin_X/xpdf" />
+      </element>
+    </root>
+  </artifact>
+</component>

@@ -99,7 +99,7 @@ public class Shamela4WithPdf
 		final Statement stmtMaster = conMaster.createStatement();
 		final Statement stmtMaster2 = conMaster.createStatement();
 
-		final ResultSet rsPDF = stmtMaster.executeQuery("SELECT * FROM book where pdf_links NOT NULL AND book_id = 1727");
+		final ResultSet rsPDF = stmtMaster.executeQuery("SELECT * FROM book where pdf_links NOT NULL");
 		while (rsPDF.next())
 		{
 			final String pdf_links = rsPDF.getString("pdf_links");
@@ -491,6 +491,8 @@ public class Shamela4WithPdf
 												{
 													bookPdfFiles.removeElementAt(o);
 													bookPdfNames.removeElementAt(o);
+													o--;
+													continue;
 												}
 
 												if (bookPdfNames.elementAt(o).equals("0")) // '0' in all cases means the book contain many parts e.g. ["badae_p1.pdf|التقديم", "badae_p2.pdf|المقدمة", "badae_1-4.pdf|0", "badae_5.pdf"] ["tafseer_terefi.pdf|0", "tafseer_terefi_i.pdf"]

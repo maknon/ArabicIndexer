@@ -23,8 +23,7 @@ import javax.swing.filechooser.*;
 import java.sql.*;
 import java.nio.channels.*;
 
-class
-Update extends JDialog
+class Update extends JDialog
 {
 	private final float currentSystemVersion, currentDBVersion;
 
@@ -430,7 +429,7 @@ Update extends JDialog
 													final Path pdfTemp = Paths.get(ArabicIndexer.programFolder + "temp/" + pdfNameToken);
 													if (Files.exists(pdfTemp))
 													{
-														// Allow having the same pdf file for multiple books
+														// Version 2.1, Allow having the same pdf file for multiple books
 														if (Files.mismatch(pdfTemp, Paths.get(ArabicIndexer.programFolder + "pdf/" + pdfNameToken)) == -1)
 															pathToken = "root:pdf" + File.separator + pdfNameToken;
 														else

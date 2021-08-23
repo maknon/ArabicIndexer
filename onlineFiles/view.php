@@ -13,7 +13,7 @@ else
 	$title = $_GET['t'];
 
 $imagesDirectory = "bk/".$bk;
-$baseDirectory = "https://www.maknoon.com/ai/bk/".$bk;
+$baseDirectory = "https://www.maknoon.org/ai/bk/".$bk;
 
 $fi = new FilesystemIterator($imagesDirectory, FilesystemIterator::SKIP_DOTS);
 $pageMax = (iterator_count($fi)-1)/2;
@@ -53,8 +53,25 @@ else {
 	$firstPageClass = 'disabled';
 }
 
+function getbody($filename) {
+	$file = file_get_contents($filename);       
+	$dom = new DOMDocument;
+	$dom->loadHTML($file);
+	$bodies = $dom->getElementsByTagName('body');
+	assert($bodies->length === 1);
+	$body = $bodies->item(0);
+	for ($i = 0; $i < $body->children->length; $i++) {
+		$body->remove($body->children->item($i));
+	}
+	$stringbody = $dom->saveHTML($body);
+	return $stringbody;
+}
+
+//$pageContent = file_get_contents(`$imagesDirectory/$currentPage.html`, FILE_USE_INCLUDE_PATH);
+$pageContent = getbody($imagesDirectory."/".$currentPage.".html");
+
 echo "<!DOCTYPE html>
-<html>
+<html dir='rtl' lang='ar'>
 <head>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>$title</title>
@@ -92,6 +109,18 @@ body {
 	margin: auto;
 }
 
+figure {
+	margin: auto;
+	width: 100%;
+}
+
+figcaption {
+	padding: 5px;
+	border: 1px #cccccc solid;
+	margin: 5px;
+	display: none;
+}
+
 .img-container {
 	position: absolute;
 	top: 0;
@@ -111,27 +140,30 @@ body {
 <body>
 
 <div class='img-container'>
-	<img src='$imagesDirectory/$currentPage.png' id='page' class='img'>
+	<figure>
+		<img src='$imagesDirectory/$currentPage.png' id='page' class='img'>
+	    <figcaption id='cap'>$pageContent</figcaption>
+	</figure>
 </div>
 
 <div class='navbar' id='navbar'>
 	<div>
 		<a onclick='swap()'>
-			<img src='swap.svg' id='swap' alt='Collapse'>
+			<img src='swap.svg' id='swap'>
 		</a>
 	</div>
-	<div id='home'>
+	<div id='home' style='display:block'>
 		<a href='https://www.maknoon.com/community/pages/ai/'>
 			<img src='home.svg' alt='Back to Main'>
 		</a>
 	</div>
 	<div id='last' class='$lastPageClass'>
-		<a href='https://www.maknoon.com/ai/view.php?bk=$bk&amp;p=$pageMax&amp;t=$title'>
+		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=$pageMax&amp;t=$title'>
 			<img src='last.svg' alt='Last Page'>
 		</a>
 	</div>
 	<div id='next' class='$nextPageClass'>
-		<a href='https://www.maknoon.com/ai/view.php?bk=$bk&amp;p=$nextPage&amp;t=$title'>
+		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=$nextPage&amp;t=$title'>
 			<img src='forward.svg' alt='Next Page'>
 		</a>
 	</div>
@@ -142,12 +174,12 @@ body {
 		<label style='background:rgb(200,200,200,0.5);padding:5px;font-size:15px;font-family:Arial;display:inline-block;text-align:center;border:1px solid;border-color:rgb(200,200,200,0.5);width:2rem;'>$pageMax</label>
 	</div>
 	<div id='back' class='$previousPageClass'>
-		<a href='https://www.maknoon.com/ai/view.php?bk=$bk&amp;p=$previousPage&amp;t=$title'>
+		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=$previousPage&amp;t=$title'>
 			<img src='back.svg' alt='Previous Page'>
 		</a>
 	</div>
 	<div id='first' class='$firstPageClass'>
-		<a href='https://www.maknoon.com/ai/view.php?bk=$bk&amp;p=1&amp;t=$title'>
+		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=1&amp;t=$title'>
 			<img src='first.svg' alt='First Page'>
 		</a>
 	</div>
@@ -157,7 +189,7 @@ body {
 		</a>
 	</div>
 	<div id='text'>
-		<a href='$baseDirectory/$currentPage.html' target='_blank'>
+		<a onclick='caption()'>
 			<img src='text.svg' alt='Show as text'>
 		</a>
 	</div>
@@ -173,19 +205,19 @@ echo "
 		if(event.keyCode == 13) {
 			var page = Number(e.value);
 			if(isNaN(page)) {
-				window.location.href = 'https://www.maknoon.com/ai/view.php?bk=$bk&p=$currentPage';
+				window.location.href = 'https://www.maknoon.org/ai/view.php?bk=$bk&p=$currentPage';
 			} else {
 				if(page >= 1 && page <= pageMax) {
-					window.location.href = `https://www.maknoon.com/ai/view.php?bk=$bk&p=\${page}`;
+					window.location.href = `https://www.maknoon.org/ai/view.php?bk=$bk&p=\${page}`;
 				} else {
-					window.location.href = 'https://www.maknoon.com/ai/view.php?bk=$bk&p=$currentPage';
+					window.location.href = 'https://www.maknoon.org/ai/view.php?bk=$bk&p=$currentPage';
 				}
 			}
 		}
 	}
 	
 	function swap() {
-		if(document.getElementById('swap').alt == 'Collapse') {
+		if(document.getElementById('home').style.display === 'block') {
 			document.getElementById('home').style.display = 'none';
 			document.getElementById('first').style.display = 'none';
 			document.getElementById('next').style.display = 'none';
@@ -195,7 +227,6 @@ echo "
 			document.getElementById('back').style.display = 'none';
 			document.getElementById('pdf').style.display = 'none';
 			document.getElementById('text').style.display = 'none';
-			document.getElementById('swap').alt = 'Expand';
 		} else {
 			document.getElementById('home').style.display = 'block';
 			document.getElementById('first').style.display = 'block';
@@ -206,10 +237,18 @@ echo "
 			document.getElementById('back').style.display = 'block';
 			document.getElementById('pdf').style.display = 'block';
 			document.getElementById('text').style.display = 'block';
-			document.getElementById('swap').alt = 'Collapse';
 		}
 	}
 
+	function caption() {
+		var x = document.getElementById('cap');
+		if(x.style.display === 'block') {
+			x.style.display = 'none';
+		} else {
+			x.style.display = 'block';
+			x.scrollIntoView();
+		}
+	}
 </script>
 
 </body>
