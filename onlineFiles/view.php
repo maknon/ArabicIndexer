@@ -13,10 +13,11 @@ else
 	$title = $_GET['t'];
 
 $imagesDirectory = "bk/".$bk;
-$baseDirectory = "https://www.maknoon.org/ai/bk/".$bk;
+$baseDirectory = "https://maknoon.org/ai/bk/".$bk;
 
-$fi = new FilesystemIterator($imagesDirectory, FilesystemIterator::SKIP_DOTS);
-$pageMax = (iterator_count($fi)-1)/2;
+//$fi = new FilesystemIterator($imagesDirectory, FilesystemIterator::SKIP_DOTS);
+//$pageMax = (iterator_count($fi)-1)/2;
+$pageMax = count(glob($imagesDirectory."/*.png", GLOB_NOSORT));
 
 if (empty($_GET['p']))
 	$currentPage = 1;
@@ -36,6 +37,7 @@ $nextPageClass = 'n';
 $previousPageClass = 'n';
 $lastPageClass = 'n';
 $firstPageClass = 'n';
+$text = 'n';
 	
 if (($currentPage + 1) <= $pageMax)
 	$nextPage = $currentPage + 1;
@@ -53,22 +55,10 @@ else {
 	$firstPageClass = 'disabled';
 }
 
-function getbody($filename) {
-	$file = file_get_contents($filename);       
-	$dom = new DOMDocument;
-	$dom->loadHTML($file);
-	$bodies = $dom->getElementsByTagName('body');
-	assert($bodies->length === 1);
-	$body = $bodies->item(0);
-	for ($i = 0; $i < $body->children->length; $i++) {
-		$body->remove($body->children->item($i));
-	}
-	$stringbody = $dom->saveHTML($body);
-	return $stringbody;
-}
+$pageContent = file_get_contents($imagesDirectory.'/'.$currentPage.'.htm');
 
-//$pageContent = file_get_contents(`$imagesDirectory/$currentPage.html`, FILE_USE_INCLUDE_PATH);
-$pageContent = getbody($imagesDirectory."/".$currentPage.".html");
+if($pageContent === FALSE)
+	$text = 'disabled';
 
 echo "<!DOCTYPE html>
 <html dir='rtl' lang='ar'>
@@ -153,17 +143,17 @@ figcaption {
 		</a>
 	</div>
 	<div id='home' style='display:block'>
-		<a href='https://www.maknoon.com/community/pages/ai/'>
+		<a href='https://maknoon.org'>
 			<img src='home.svg' alt='Back to Main'>
 		</a>
 	</div>
 	<div id='last' class='$lastPageClass'>
-		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=$pageMax&amp;t=$title'>
+		<a href='https://maknoon.org/ai/view.php?bk=$bk&amp;p=$pageMax&amp;t=$title'>
 			<img src='last.svg' alt='Last Page'>
 		</a>
 	</div>
 	<div id='next' class='$nextPageClass'>
-		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=$nextPage&amp;t=$title'>
+		<a href='https://maknoon.org/ai/view.php?bk=$bk&amp;p=$nextPage&amp;t=$title'>
 			<img src='forward.svg' alt='Next Page'>
 		</a>
 	</div>
@@ -174,12 +164,12 @@ figcaption {
 		<label style='background:rgb(200,200,200,0.5);padding:5px;font-size:15px;font-family:Arial;display:inline-block;text-align:center;border:1px solid;border-color:rgb(200,200,200,0.5);width:2rem;'>$pageMax</label>
 	</div>
 	<div id='back' class='$previousPageClass'>
-		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=$previousPage&amp;t=$title'>
+		<a href='https://maknoon.org/ai/view.php?bk=$bk&amp;p=$previousPage&amp;t=$title'>
 			<img src='back.svg' alt='Previous Page'>
 		</a>
 	</div>
 	<div id='first' class='$firstPageClass'>
-		<a href='https://www.maknoon.org/ai/view.php?bk=$bk&amp;p=1&amp;t=$title'>
+		<a href='https://maknoon.org/ai/view.php?bk=$bk&amp;p=1&amp;t=$title'>
 			<img src='first.svg' alt='First Page'>
 		</a>
 	</div>
@@ -188,7 +178,7 @@ figcaption {
 			<img src='pdf.svg' alt='Download as PDF'>
 		</a>
 	</div>
-	<div id='text'>
+	<div id='text' class='$text'>
 		<a onclick='caption()'>
 			<img src='text.svg' alt='Show as text'>
 		</a>
@@ -205,12 +195,12 @@ echo "
 		if(event.keyCode == 13) {
 			var page = Number(e.value);
 			if(isNaN(page)) {
-				window.location.href = 'https://www.maknoon.org/ai/view.php?bk=$bk&p=$currentPage';
+				window.location.href = 'https://maknoon.org/ai/view.php?bk=$bk&p=$currentPage';
 			} else {
 				if(page >= 1 && page <= pageMax) {
-					window.location.href = `https://www.maknoon.org/ai/view.php?bk=$bk&p=\${page}`;
+					window.location.href = `https://maknoon.org/ai/view.php?bk=$bk&p=\${page}`;
 				} else {
-					window.location.href = 'https://www.maknoon.org/ai/view.php?bk=$bk&p=$currentPage';
+					window.location.href = 'https://maknoon.org/ai/view.php?bk=$bk&p=$currentPage';
 				}
 			}
 		}

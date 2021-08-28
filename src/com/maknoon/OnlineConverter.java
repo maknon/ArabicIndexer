@@ -19,7 +19,7 @@ public class OnlineConverter
 {
 	final String base = "C:/Users/Ebrahim/Desktop/ai/bk/";
 
-	final static boolean allDB = false;
+	final static boolean allDB = true;
 	String ids = "(6305,6304)";
 	String programFolder;
 	Connection sharedDBConnection;
@@ -58,7 +58,6 @@ public class OnlineConverter
 				rs = stmt.executeQuery("SELECT id, name, path FROM arabicBook WHERE (author = '" + authorName + "' AND parent = '') ORDER BY name");
 			else
 				rs = stmt.executeQuery("SELECT id, name, path FROM arabicBook WHERE (author = '" + authorName + "' AND parent = '' AND id IN " + ids + ") ORDER BY name");
-			boolean first = true;
 			while (rs.next())
 			{
 				final String path = rs.getString("path");
@@ -84,13 +83,13 @@ public class OnlineConverter
 				rs3.close();
 				stmt3.close();
 
-				if (first)
-				{
-					listMenu = listMenu + "\n<a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + firstPage + "&amp;t=" + title + "' target='_blank'>" + title + "</a>";
-					first = false;
-				}
-				else
-					listMenu = listMenu + "\n<br><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + firstPage + "&amp;t=" + title + "' target='_blank'>" + title + "</a>";
+				if (rs.isFirst())
+					listMenu = listMenu + "\n<ul>";
+
+				listMenu = listMenu + "\n<li><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + firstPage + "&amp;t=" + title.replace(" ", "%20").replaceAll("[\"{}\\[\\]]", "") + "' target='_blank'>" + title + "</a></li>";
+
+				if (rs.isLast())
+					listMenu = listMenu + "\n</ul>";
 			}
 			rs.close();
 
@@ -111,7 +110,6 @@ public class OnlineConverter
 					rs1 = stmt1.executeQuery("SELECT * FROM arabicBook WHERE (author = '" + authorName + "' AND parent = '" + bookParent + "') ORDER BY LENGTH(name), name");
 				else
 					rs1 = stmt1.executeQuery("SELECT * FROM arabicBook WHERE (author = '" + authorName + "' AND parent = '" + bookParent + "' AND id IN " + ids + ") ORDER BY LENGTH(name), name");
-				first = true;
 				while (rs1.next())
 				{
 					final String path = rs1.getString("path");
@@ -139,13 +137,13 @@ public class OnlineConverter
 					rs3.close();
 					stmt3.close();
 
-					if (first)
-					{
-						listMenu = listMenu + "\n<a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + firstPage + "&amp;t=" + htmlTitle + "' target='_blank'>" + title + "</a>";
-						first = false;
-					}
-					else
-						listMenu = listMenu + "\n<br><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + firstPage + "&amp;t=" + htmlTitle + "' target='_blank'>" + title + "</a>";
+					if (rs1.isFirst())
+						listMenu = listMenu + "\n<ul>";
+
+					listMenu = listMenu + "\n<li><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + firstPage + "&amp;t=" + htmlTitle.replace(" ", "%20").replaceAll("[\"{}\\[\\]]", "") + "' target='_blank'>" + title + "</a></li>";
+
+					if (rs1.isLast())
+						listMenu = listMenu + "\n</ul>";
 				}
 				rs1.close();
 				listMenu = listMenu + "\n</details>";
@@ -288,7 +286,7 @@ public class OnlineConverter
 				final int page = rs.getInt("page");
 				pg.removeElement(page);
 
-				final File f = new File(newFolder, page + ".html");
+				final File f = new File(newFolder, page + ".htm");
 				final File p = new File(newFolder, page + ".png");
 
 				if(!f.exists() && p.exists())
@@ -303,7 +301,7 @@ public class OnlineConverter
 							"<h3>كتاب " + title + "</h3>\n" +
 							"<h4>الصفحة " + page + "</h4>\n" +
 							content.replace("\n", "<br>") + "\n" +
-							"<p><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + page + "&amp;t=" + title + "'>عودة للكتاب</a>\n" +
+							"<p><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + page + "&amp;t=" + title.replace(" ", "%20").replaceAll("[\"{}\\[\\]]", "") + "'>عودة للكتاب</a>\n" +
 							"&nbsp;&nbsp;<a href=\"https://maknoon.com/community/pages/ai/\">قائمة الكتب</a></p>\n" +
 							"\n" +
 							"</body>\n" +
@@ -341,7 +339,7 @@ public class OnlineConverter
 							"<h3>كتاب " + bookTitle + "</h3>\n" +
 							"<h4>الصفحة " + pg.elementAt(i) + "</h4>\n" +
 							"الصفحة غير موجودة\n" +
-							"<p><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + pg.elementAt(i) + "&amp;t=" + bookTitle + "'>عودة للكتاب</a>\n" +
+							"<p><a href='https://maknoon.org/ai/view.php?bk=" + folderName + "&amp;p=" + pg.elementAt(i) + "&amp;t=" + bookTitle.replace(" ", "%20").replaceAll("[\"{}\\[\\]]", "") + "'>عودة للكتاب</a>\n" +
 							"&nbsp;&nbsp;<a href=\"https://maknoon.com/community/pages/ai/\">قائمة الكتب</a></p>\n" +
 							"\n" +
 							"</body>\n" +
@@ -349,7 +347,7 @@ public class OnlineConverter
 
 					try
 					{
-						Files.writeString(new File(newFolder, pg.elementAt(i) + ".html").toPath(), html, StandardOpenOption.CREATE_NEW); // DO NOT OVERWRITE. in many cases, because of parallel processing, creating the first book empty files came after creating the other books and this overwrite the original pages !
+						Files.writeString(new File(newFolder, pg.elementAt(i) + ".htm").toPath(), html, StandardOpenOption.CREATE_NEW); // DO NOT OVERWRITE. in many cases, because of parallel processing, creating the first book empty files came after creating the other books and this overwrite the original pages !
 					}
 					catch (FileAlreadyExistsException e)
 					{

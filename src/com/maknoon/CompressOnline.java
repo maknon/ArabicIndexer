@@ -50,7 +50,7 @@ public class CompressOnline
 
 				if (++count == 50 || i == filesInDir.length - 1)
 				{
-					//final Process proc = Runtime.getRuntime().exec(new String[]{new File("C:/Program Files/WinRAR/winrar.exe").getAbsolutePath(), "a", "-afzip", zipName + ".zip", folders});
+					// "C:\Program Files\WinRAR\winrar.exe" a -afzip 1.zip ai\01 ai\02
 					//final Process proc = Runtime.getRuntime().exec("C:/Program Files/WinRAR/winrar.exe a -aftar " + zipName + ".tar" + folders);
 					final Process proc = Runtime.getRuntime().exec("tar -cf " + outBase + zipName + ".tar" + folders); // Windows support out of the box with best performance !!
 

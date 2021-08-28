@@ -141,8 +141,8 @@ public class OnlineConverterPostProcess
 				{
 					final int page = rs.getInt("page");
 
-					final File f2 = new File(newFolder2, page + ".html");
-					final File f = new File(newFolder1, page + ".html");
+					final File f2 = new File(newFolder2, page + ".htm");
+					final File f = new File(newFolder1, page + ".htm");
 					final File p = new File(newFolder1, page + ".png");
 
 					if (!f.exists() && p.exists())
