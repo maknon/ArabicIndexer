@@ -18,7 +18,7 @@
     <orderEntry type="library" name="net.sourceforge.tess4j:tess4j:4.5.5" level="project" />
     <orderEntry type="library" name="org.xerial:sqlite-jdbc:3.36.0.1" level="project" />
     <orderEntry type="library" name="org.json:json:20210307" level="project" />
-    <orderEntry type="library" name="org.elasticsearch.client:elasticsearch-rest-high-level-client:7.14.0" level="project" />
+    <orderEntry type="library" name="org.elasticsearch.client:elasticsearch-rest-high-level-client:7.15.0" level="project" />
     <orderEntry type="library" name="org.apache.lucene:lucene-highlighter:8.9.0" level="project" />
   </component>
 </module>

@@ -3,14 +3,14 @@
 
 	<property name="build.dir"				value="build"/>
 	<property name="app.name"				value="مفهرس المخطوطات"/>
-	<property name="tools.dir"				value="E:\Others\MIE Support programs"/>
+	<property name="tools.dir"				value="E:\Support"/>
 	<property name="makensis.exe"			value="${tools.dir}\nsis\makensis.exe"/>
 	<property name="launch4j.jar"			value="${tools.dir}\launch4j\launch4j.jar"/>
 	<property name="ResourceHacker.exe"		value="${tools.dir}\Resource Hacker\ResourceHacker.exe"/>
-	<property name="jdk.linux"				value="openjdk-16_linux-x64_bin.tar.gz"/>
-	<property name="jdk.mac"				value="openjdk-16_osx-x64_bin.tar.gz"/>
+	<property name="jdk.linux"				value="openjdk-17_linux-x64_bin.tar.gz"/>
+	<property name="jdk.mac"				value="openjdk-17_macos-x64_bin.tar.gz"/>
 	<property name="jdk.win"				value="openjdk-15_windows-x64_bin.zip"/> <!-- www.bell-sw.com -->
-	<property name="java.old"				value="C:\Users\Ebrahim\Desktop\zulu8.46.0.19-ca-jdk8.0.252-win_x64\bin\java"/>
+	<property name="java.old"				value="E:\Support\zulu8.56.0.21-ca-jdk8.0.302-win_x64\bin\java"/>
 
 	<path id="class.path">
 		<fileset dir="${build.dir}" includes="lib/*"/>
