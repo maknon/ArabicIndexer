@@ -2,7 +2,7 @@ package com.maknoon;
 
 /*
  * Maknoon Manuscripts Indexer
- * Version 2.1
+ * Version 2.2
  */
 import javax.swing.*;
 import java.awt.*;

@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.maknoon</groupId>
 	<artifactId>arabic-indexer</artifactId>
-	<version>2.1</version>
+	<version>2.2</version>
 
 	<dependencies>
 		<dependency>
@@ -15,6 +15,7 @@
 			<artifactId>weblaf-ui</artifactId>
 			<version>1.2.13</version>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -22,13 +23,14 @@
 			<scope>system</scope>
 			<systemPath>E:/ArabicIndexer/bin_X/h2-2.0.201.jar</systemPath>
 		</dependency>
-		<!--
+		-->
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.200</version>
+			<version>2.0.202</version>
 		</dependency>
-		-->
+
 		<dependency>
 			<groupId>net.sf.ucanaccess</groupId>
 			<artifactId>ucanaccess</artifactId>
@@ -36,28 +38,28 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers-common</artifactId>
-			<version>8.9.0</version>
+			<artifactId>lucene-analysis-common</artifactId>
+			<version>9.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-highlighter</artifactId>
-			<version>8.9.0</version>
+			<version>9.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queryparser</artifactId>
-			<version>8.9.0</version>
+			<version>9.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>kernel</artifactId>
-			<version>7.1.16</version>
+			<version>7.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.tess4j</groupId>
 			<artifactId>tess4j</artifactId>
-			<version>4.5.5</version>
+			<version>5.0.0</version>
 		</dependency>
 	</dependencies>
 
@@ -74,7 +76,7 @@
 								<artifactItem>
 									<groupId>com.maknoon</groupId>
 									<artifactId>arabic-indexer</artifactId>
-									<version>2.1</version>
+									<version>2.2</version>
 									<type>[ packaging ]</type>
 									<outputDirectory>${project.basedir}/lib</outputDirectory>
 								</artifactItem>
