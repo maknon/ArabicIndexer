@@ -20,5 +20,6 @@
     <orderEntry type="library" name="org.apache.lucene:lucene-highlighter" level="project" />
     <orderEntry type="library" name="org.apache.lucene:lucene.analysis.common" level="project" />
     <orderEntry type="library" name="com.h2database:h2" level="project" />
+    <orderEntry type="library" name="ghost4j" level="project" />
   </component>
 </module>

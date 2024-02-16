@@ -3,6 +3,8 @@ package com.maknoon;
 import com.alee.laf.filechooser.WebFileChooser;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -21,13 +23,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static net.sourceforge.tess4j.util.PdfUtilities.PDFBOX;
-import static net.sourceforge.tess4j.util.PdfUtilities.PDF_LIBRARY;
 
 public final class Ocr extends JDialog
 {
@@ -83,10 +84,7 @@ public final class Ocr extends JDialog
 			e.printStackTrace();
 		}
 
-		if(pdfBox)
-			System.setProperty(PDF_LIBRARY, PDFBOX);
-		else
-			System.setProperty("jna.library.path", ArabicIndexer.programFolder + "bin");
+		System.setProperty("jna.library.path", ArabicIndexer.programFolder + "bin");
 
 		final JButton browse = new JButton(translation[2], new ImageIcon(ArabicIndexer.programFolder + "images/open.png"));
 		browse.addActionListener(new ActionListener()
@@ -188,7 +186,7 @@ public final class Ocr extends JDialog
 															final OutputStreamWriter out3 = new OutputStreamWriter(new FileOutputStream(ArabicIndexer.programFolder + "temp/" + pdf + ".txt"), StandardCharsets.UTF_8);
 
 															//final File[] pages = PdfUtilities.convertPdf2Png(b); // Default dpi = 300
-															final File[] pages = pdfBox?convertPdf2Png(b):Gs_convertPdf2Png(b); // to increase dpi
+															final File[] pages = pdfBox? convertPdf2Png(b):Gs_convertPdf2Png(b); // to increase dpi
 
 															append(translation[9]);
 
@@ -411,7 +409,7 @@ public final class Ocr extends JDialog
 		PDDocument document = null;
 		try
 		{
-			document = PDDocument.load(inputPdfFile);
+			document = Loader.loadPDF(new RandomAccessReadBufferedFile(inputPdfFile));
 			final PDFRenderer pdfRenderer = new PDFRenderer(document);
 			for (int page = 0; page < document.getNumberOfPages(); ++page)
 			{
@@ -428,8 +426,7 @@ public final class Ocr extends JDialog
 		}
 		finally
 		{
-			final String[] ls = imageDir.list();
-			if (ls != null && ls.length == 0)
+			if (imageDir.list().length == 0)
 				imageDir.delete();
 
 			if (document != null)
@@ -440,24 +437,44 @@ public final class Ocr extends JDialog
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
 				}
 			}
 		}
 
 		// find working files
-		return imageDir.listFiles(new FilenameFilter()
+		File[] workingFiles = imageDir.listFiles(new FilenameFilter()
 		{
+
 			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.toLowerCase().matches("workingimage\\d{4}\\.png$");
 			}
 		});
+
+		// workingFiles should be non-null here if the operation completed successfully
+		// https://docs.oracle.com/javase/7/docs/api/java/io/File.html#listFiles()
+		if (workingFiles == null)
+		{
+			// Instead of throwing a NullPointerException, throw an IOException instead
+			// Clients of this library shouldn't be catching NullPointerExceptions thrown by this library
+			throw new IOException("Error extracting PDF Document");
+		}
+
+		Arrays.sort(workingFiles, new Comparator<File>()
+		{
+			@Override
+			public int compare(File f1, File f2)
+			{
+				return f1.getName().compareTo(f2.getName());
+			}
+		});
+
+		return workingFiles;
 	}
 
 	// Converts PDF to PNG format using GS. modified to increase DPI. src from:
-	// https://github.com/nguyenq/tess4j/blob/master/src/main/java/net/sourceforge/tess4j/util/PdfGsUtilities.java
+	//https://github.com/nguyenq/tess4j/blob/779132cde73c032cd39dfa475582211de3fd9819/src/main/java/net/sourceforge/tess4j/util/PdfGsUtilities.java
 	public synchronized static File[] Gs_convertPdf2Png(File inputPdfFile) throws IOException
 	{
 		final Path path = Files.createTempDirectory("tessimages");
@@ -512,7 +529,7 @@ public final class Ocr extends JDialog
 		}
 
 		// find working files
-		return imageDir.listFiles(new FilenameFilter()
+		File[] workingFiles = imageDir.listFiles(new FilenameFilter()
 		{
 			@Override
 			public boolean accept(File dir, String name)
@@ -520,5 +537,25 @@ public final class Ocr extends JDialog
 				return name.toLowerCase().matches("workingimage\\d{4}\\.png$");
 			}
 		});
+
+		// workingFiles should be non-null here if the operation completed successfully
+		// https://docs.oracle.com/javase/7/docs/api/java/io/File.html#listFiles()
+		if (workingFiles == null)
+		{
+			// Instead of throwing a NullPointerException, throw an IOException instead
+			// Clients of this library shouldn't be catching NullPointerExceptions thrown by this library
+			throw new IOException("Error extracting PDF Document");
+		}
+
+		Arrays.sort(workingFiles, new Comparator<File>()
+		{
+			@Override
+			public int compare(File f1, File f2)
+			{
+				return f1.getName().compareTo(f2.getName());
+			}
+		});
+
+		return workingFiles;
 	}
 }

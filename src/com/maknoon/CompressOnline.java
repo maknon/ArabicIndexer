@@ -4,20 +4,14 @@ import java.io.*;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 // This class is to compress online files into multiple zip files so that we can upload it fast and decompress from file manager of the cpanel
 // It should be run from the same folder that contains 'bk' since it uses external tar. if from Intellij, change 'Working Directory' before you run it
 public class CompressOnline
 {
-	final String outBase = "F:\\ai-online\\";
+	final String outBase = "C:\\Users\\ias12\\Desktop\\ai\\";
 
 	CompressOnline() throws IOException, InterruptedException
 	{
@@ -48,7 +42,7 @@ public class CompressOnline
 			{
 				folders = folders + " bk\\" + filesInDir[i].getName();
 
-				if (++count == 50 || i == filesInDir.length - 1)
+				if (++count == 70 || i == filesInDir.length - 1)
 				{
 					// "C:\Program Files\WinRAR\winrar.exe" a -afzip 1.zip ai\01 ai\02
 					//final Process proc = Runtime.getRuntime().exec("C:/Program Files/WinRAR/winrar.exe a -aftar " + zipName + ".tar" + folders);
