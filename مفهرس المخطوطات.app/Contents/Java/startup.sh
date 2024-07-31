@@ -8,4 +8,5 @@ cd "$(dirname "${0}")" || exit 1
 	-Dapple.laf.useScreenMenuBar=true \
 	-Xdock:name="المفهرس" \
 	-Xdock:icon=../Resources/icon.icns \
+	--add-modules jdk.incubator.vector \
 	-jar ArabicIndexer.jar "$@"

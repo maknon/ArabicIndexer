@@ -6,15 +6,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.maknoon</groupId>
-	<artifactId>arabic-indexer</artifactId>
+	<artifactId>arabicindexer</artifactId>
 	<version>2.2</version>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.weblookandfeel</groupId>
-			<artifactId>weblaf-ui</artifactId>
-			<version>1.2.13</version>
-		</dependency>
 		<!--
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -24,11 +19,20 @@
 			<systemPath>E:/ArabicIndexer/bin_X/h2-2.0.201.jar</systemPath>
 		</dependency>
 		-->
-
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf-jide-oss</artifactId>
+			<version>3.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>jide-oss</artifactId>
+			<version>3.7.15</version>
+		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>2.1.212</version>
+			<version>2.3.230</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ghost4j</groupId>
@@ -43,27 +47,27 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-analysis-common</artifactId>
-			<version>9.2.0</version>
+			<version>9.11.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-highlighter</artifactId>
-			<version>9.2.0</version>
+			<version>9.11.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queryparser</artifactId>
-			<version>9.2.0</version>
+			<version>9.11.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>kernel</artifactId>
-			<version>7.2.2</version>
+			<version>8.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.tess4j</groupId>
 			<artifactId>tess4j</artifactId>
-			<version>5.2.1</version>
+			<version>5.12.0</version>
 		</dependency>
 	</dependencies>
 
@@ -79,7 +83,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>com.maknoon</groupId>
-									<artifactId>arabic-indexer</artifactId>
+									<artifactId>arabicindexer</artifactId>
 									<version>2.2</version>
 									<type>[ packaging ]</type>
 									<outputDirectory>${project.basedir}/lib</outputDirectory>

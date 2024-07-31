@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="com.formdev:jide-oss" type="repository">
+    <properties maven-id="com.formdev:jide-oss:3.7.15" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/formdev/jide-oss/3.7.15/jide-oss-3.7.15.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -7,10 +7,9 @@
 	<property name="makensis.exe"			value="${tools.dir}\nsis\makensis.exe"/>
 	<property name="launch4j.jar"			value="${tools.dir}\launch4j\launch4j.jar"/>
 	<property name="ResourceHacker.exe"		value="${tools.dir}\Resource Hacker\ResourceHacker.exe"/>
-	<property name="jdk.linux"				value="openjdk-17_linux-x64_bin.tar.gz"/>
-	<property name="jdk.mac"				value="openjdk-17_macos-x64_bin.tar.gz"/>
-	<property name="jdk.win"				value="openjdk-15_windows-x64_bin.zip"/> <!-- www.bell-sw.com -->
-	<property name="java.old"				value="E:\Support\zulu8.56.0.21-ca-jdk8.0.302-win_x64\bin\java"/>
+	<property name="jdk.linux"				value="openjdk-21_linux-x64_bin.tar.gz"/>
+	<property name="jdk.mac"				value="openjdk-21_macos-x64_bin.tar.gz"/>
+	<property name="jdk.win"				value="openjdk-21_windows-x64_bin.zip"/> <!-- www.bell-sw.com -->
 
 	<path id="class.path">
 		<fileset dir="${build.dir}" includes="lib/*"/>
@@ -61,9 +60,7 @@
 			   srcdir="${build.dir}/src"
 			   destdir="${build.dir}"
 			   encoding="UTF-8"
-			   classpathref="class.path"
-			   source="15"
-			   target="15">
+			   classpathref="class.path">
 			<exclude name="com/maknoon/ShamelaWithPdf.java"/>
 			<exclude name="com/maknoon/ShamelaWithPdf_test.java"/>
 			<exclude name="com/maknoon/Shamela4WithPdf.java"/>
@@ -71,7 +68,6 @@
 			<exclude name="com/maknoon/GoogleTTS.java"/>
 			<exclude name="com/maknoon/GS.java"/>
 			<exclude name="com/maknoon/Thesaurus.java"/>
-			<exclude name="com/maknoon/WebLaFTest.java"/>
 			<exclude name="com/maknoon/OnlineConverter.java"/>
 			<exclude name="com/maknoon/ArabicRootIndexing.java"/>
 			<exclude name="com/maknoon/MoveShamelaV4Duplicates.java"/>
@@ -125,6 +121,23 @@
 	</target>
 
 	<target name="launch4j">
+		<!-- for old launch4j 3.12, it is not working with jdk newer than 1.8
+		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
+			<arg value="/c"/>
+			<arg value='"${java}" -Dfile.encoding=windows-1252 -jar "${launch4j.jar}" audiocataloger.xml'/>
+		</exec>
+		-->
+
+		<java dir="${build.dir}" jar="${launch4j.jar}" fork="true">
+			<jvmarg value="-Dfile.encoding=windows-1252"/>
+			<arg value="arabicindexer.xml"/>
+		</java>
+		<java dir="${build.dir}" jar="${launch4j.jar}" fork="true">
+			<jvmarg value="-Dfile.encoding=windows-1252"/>
+			<arg value="launcher.xml"/>
+		</java>
+		
+		<!--
 		<exec dir="${build.dir}" executable="cmd" failonerror="true" >
 			<arg value="/c"/>
 			<arg value='"${java.old}" -Dfile.encoding=windows-1252 -jar "${launch4j.jar}" arabicindexer.xml'/>
@@ -133,15 +146,8 @@
 			<arg value="/c"/>
 			<arg value='"${java.old}" -Dfile.encoding=windows-1252 -jar "${launch4j.jar}" launcher.xml'/>
 		</exec>
-
-		<!-- launch4j is not working with jdk newer than 1.8
-		<java dir="${build.dir}" jar="${launch4j.jar}" fork="true">
-			<arg value="arabicindexer.xml"/>
-		</java>
-		<java dir="${build.dir}" jar="${launch4j.jar}" fork="true">
-			<arg value="launcher.xml"/>
-		</java>
 		-->
+
 	</target>
 
 	<target name="ResourceHacker">

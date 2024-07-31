@@ -1,31 +1,23 @@
 <component name="libraryTable">
   <library name="net.sourceforge.tess4j:tess4j" type="repository">
-    <properties maven-id="net.sourceforge.tess4j:tess4j:5.10.0" />
+    <properties maven-id="net.sourceforge.tess4j:tess4j:5.12.0" />
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/net/sourceforge/tess4j/tess4j/5.10.0/tess4j-5.10.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/sourceforge/tess4j/tess4j/5.12.0/tess4j-5.12.0.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/net/java/dev/jna/jna/5.14.0/jna-5.14.0.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/com/github/jai-imageio/jai-imageio-core/1.4.0/jai-imageio-core-1.4.0.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox/3.0.1/pdfbox-3.0.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox-io/3.0.1/pdfbox-io-3.0.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/fontbox/3.0.1/fontbox-3.0.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.2/commons-logging-1.2.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter/5.10.1/junit-jupiter-5.10.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-api/5.10.1/junit-jupiter-api-5.10.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-commons/1.10.1/junit-platform-commons-1.10.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-params/5.10.1/junit-jupiter-params-5.10.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-engine/5.10.1/junit-jupiter-engine-5.10.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-engine/1.10.1/junit-platform-engine-1.10.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox-tools/3.0.1/pdfbox-tools-3.0.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox-debugger/3.0.1/pdfbox-debugger-3.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox/3.0.2/pdfbox-3.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox-io/3.0.2/pdfbox-io-3.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/fontbox/3.0.2/fontbox-3.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.3.0/commons-logging-1.3.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox-tools/3.0.2/pdfbox-tools-3.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/pdfbox-debugger/3.0.2/pdfbox-debugger-3.0.2.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/info/picocli/picocli/4.7.5/picocli-4.7.5.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/org/apache/pdfbox/jbig2-imageio/3.0.4/jbig2-imageio-3.0.4.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/net/sourceforge/lept4j/lept4j/1.19.0/lept4j-1.19.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/commons-io/commons-io/2.16.1/commons-io-2.16.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/sourceforge/lept4j/lept4j/1.19.1/lept4j-1.19.1.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/org/jboss/jboss-vfs/3.2.17.Final/jboss-vfs-3.2.17.Final.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.1.4.GA/jboss-logging-3.1.4.GA.jar!/" />
-      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.10/slf4j-api-2.0.10.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

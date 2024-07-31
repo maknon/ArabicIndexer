@@ -9,7 +9,6 @@ import java.util.*;
 import java.sql.*;
 import java.util.zip.*;
 import javax.swing.border.TitledBorder;
-import com.alee.laf.filechooser.WebFileChooser;
 
 public class ShamelaConverter extends JDialog
 {
@@ -26,10 +25,8 @@ public class ShamelaConverter extends JDialog
 		controlPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), translation[1], TitledBorder.CENTER, 0, null, Color.red));
 		add(controlPanel, BorderLayout.SOUTH);
 
-		final WebFileChooser fc = new WebFileChooser();
+		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		//fc.setGenerateThumbnails(false);
-		fc.getFileChooserPanel().setGenerateThumbnails(false);
 		fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(translation[2], "bok"));
 		fc.setAcceptAllFileFilterUsed(false);
 		fc.setMultiSelectionEnabled(true);

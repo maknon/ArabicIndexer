@@ -25,17 +25,9 @@ import java.awt.datatransfer.*;
 import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
-import com.alee.extended.label.WebStyledLabel;
-import com.alee.extended.tree.CheckStateChange;
-import com.alee.extended.tree.CheckStateChangeListener;
-import com.alee.extended.tree.WebCheckBoxTree;
-import com.alee.laf.WebLookAndFeel;
-import com.alee.laf.checkbox.CheckState;
-import com.alee.laf.menu.WebPopupMenu;
-
-import com.alee.managers.icon.IconManager;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
+import com.jidesoft.swing.CheckBoxTree;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.TextField;
@@ -130,248 +122,249 @@ public class ArabicIndexer extends JFrame
 	private JMenuItem importMenuItem;
 
 	// Version 2.1
-	WebCheckBoxTree<DefaultMutableTreeNode> searchTree, authorSearchTree;
+	CheckBoxTree searchTree, authorSearchTree;
 
 	static String version;
 	static String biuf_version;
 	static boolean biuf_compression;
-	static boolean large_icons;
 	static String imageFolder;
 
-	final CheckStateChangeListener<DefaultMutableTreeNode> authorSearchTreeChangeListener = new CheckStateChangeListener<>()
+	// Version 1.7, To prevent loop back event firing when selecting between search trees.
+	private static boolean searchTreeLoopPrevention = true;
+
+	final TreeSelectionListener searchTreeChangeListener = new TreeSelectionListener()
 	{
 		@Override
-		public void checkStateChanged(WebCheckBoxTree<DefaultMutableTreeNode> authorSearchTree, List<CheckStateChange<DefaultMutableTreeNode>> checkStateChanges)
+		public void valueChanged(TreeSelectionEvent e)
 		{
-			//for ( CheckStateChange change : checkStateChanges )
-			//System.out.println ( change.getNode () + ": " + change.getOldState () + " -> " + change.getNewState () );
-
-			//System.out.println(authorSearchTree.getCheckedNodes().size());
 			//TreePath[] paths = e.getPaths();
 			//for(TreePath path : paths)
-			//System.out.println((e.isAddedPath(path) ? "Added - " : "Removed - ") + path);
+				//System.out.println((e.isAddedPath(path) ? "Added - " : "Removed - ") + path);
 
-			//searchTree.getCheckBoxTreeSelectionModel().removeSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To deselect all the nodes. Not working [http://www.jidesoft.com/forum/viewtopic.php?f=18&t=12378&p=60863#p60863]
-			//searchTree.getCheckBoxTreeSelectionModel().clearSelection();// OR removeSelectionPaths(new TreePath[]{searchTree.getPathForRow(0)}); // To deselect all the nodes
-			searchTree.removeCheckStateChangeListener(searchTreeChangeListener);
-			searchTree.getCheckingModel().uncheckAll(); // To deselect all the nodes
-
-			final java.util.List<DefaultMutableTreeNode> checkedNodes = authorSearchTree.getNodes(CheckState.checked);
-			if (!checkedNodes.isEmpty())
+			if(searchTreeLoopPrevention)
 			{
-				for (final DefaultMutableTreeNode node : checkedNodes)
+				searchTreeLoopPrevention = false;
+				authorSearchTree.getCheckBoxTreeSelectionModel().clearSelection(); // To deselect all the nodes
+
+				final TreePath[] treePaths = searchTree.getCheckBoxTreeSelectionModel().getSelectionPaths();
+				if (treePaths != null)
 				{
-					//System.out.println("1: "+Arrays.toString(node.getPath()));
-					if (node.isRoot())
+					final Vector<TreePath> selectedTreePaths = new Vector<>();
+					for (final TreePath path : treePaths)
 					{
-						//searchTree.setChecked(searchTree.getRootNode(), true); // To select all the nodes
-						searchTree.checkAll(); // version 2.1, this will check all regardless of the state of the root. previous command will not check all in case root was checked previously
-						break;
-					}
-
-					final NodeInfo info = (NodeInfo) node.getUserObject();
-					//if(path.getPathCount()==2) // i.e. author, there are many ways to do this using node.isLeaf/Root or info.category.equals("") ...
-					if (info.category.equals("")) // Version 1.8
-					{
-						try
+						final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+						if (node.isRoot())
 						{
-							final Statement stmt = sharedDBConnection.createStatement();
-							ResultSet rs = stmt.executeQuery("SELECT id FROM " + bookTableName + " WHERE author = '" + info.name + "' AND parent = ''"); // Version 2.1
-							while (rs.next())
-							{
-								final int searchTreeId = rs.getInt("id");
-								final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
-								while (searchTreeNodes.hasMoreElements())
-								{
-									final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
-									if (searchTreeId == ((NodeInfo) (searchTreeNode.getUserObject())).id)
-										searchTree.setChecked(searchTreeNode, true);
-								}
-							}
+							//authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(authorSearchTree.getModel().getRoot())}); // To select all the nodes
+							selectedTreePaths.addElement(new TreePath(authorSearchTree.getModel().getRoot()));
+							break;
+						}
 
-							rs = stmt.executeQuery("SELECT parent, category FROM " + bookTableName + " WHERE (author = '" + info.name + "' AND parent != '') GROUP BY parent, category");
-							while (rs.next())
+						final NodeInfo info = (NodeInfo) node.getUserObject();
+
+						//if(path.getPathCount()==2) // i.e. category, there are many ways to do this using node.isLeaf/Root or info.category.equals("") ...
+						if (info.category.isEmpty()) // Version 1.8
+						{
+							try
 							{
-								final String multiBookName = rs.getString("parent");
-								final String category = rs.getString("category");
-								final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
-								while (searchTreeNodes.hasMoreElements())
+								final Statement stmt = sharedDBConnection.createStatement();
+								ResultSet rs = stmt.executeQuery("SELECT id FROM " + bookTableName + " WHERE category = '" + info.name + "' AND parent = ''"); // Version 2.1, replace path with id
+								while (rs.next())
 								{
-									final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
-									final NodeInfo item = (NodeInfo) searchTreeNode.getUserObject();
-									if (item.author.equals(info.name) && item.category.equals(category) && item.name.equals(multiBookName))
+									final int authorSearchTreeId = rs.getInt("id");
+									final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
+									while (authorSearchTreeNodes.hasMoreElements())
 									{
-										searchTree.setChecked(searchTreeNode, true);
-										break;
+										final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
+										if (authorSearchTreeId == ((NodeInfo) (authorSearchTreeNode.getUserObject())).id) // Version 2.1, id instead of path
+											//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
+											selectedTreePaths.addElement(new TreePath(authorSearchTreeNode.getPath()));
+									}
+								}
+
+								rs = stmt.executeQuery("SELECT parent, author FROM " + bookTableName + " WHERE (category = '" + info.name + "' AND parent != '') GROUP BY parent, author");
+								while (rs.next())
+								{
+									final String multiBookName = rs.getString("parent");
+									final String author = rs.getString("author");
+									final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
+									while (authorSearchTreeNodes.hasMoreElements())
+									{
+										final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
+										final NodeInfo item = (NodeInfo) authorSearchTreeNode.getUserObject();
+										if (item.author.equals(author) && item.category.equals(info.name) && item.name.equals(multiBookName))
+										{
+											//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
+											selectedTreePaths.addElement(new TreePath(authorSearchTreeNode.getPath()));
+											break;
+										}
+									}
+								}
+
+								stmt.close();
+							}
+							catch (Exception ex)
+							{
+								ex.printStackTrace();
+							}
+						}
+						else
+						{
+							//if(path.getPathCount()==3) // i.e. leaf/book
+							if (node.isLeaf()) // No need for this
+							{
+								if (info.path.isEmpty())
+								{
+									final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
+									while (authorSearchTreeNodes.hasMoreElements())
+									{
+										final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
+										final NodeInfo item = (NodeInfo) authorSearchTreeNode.getUserObject();
+										if (item.author.equals(info.author) && item.category.equals(info.category) && item.name.equals(info.name))
+										{
+											//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
+											selectedTreePaths.addElement(new TreePath(authorSearchTreeNode.getPath()));
+											break;
+										}
+									}
+								}
+								else
+								{
+									final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
+									while (authorSearchTreeNodes.hasMoreElements())
+									{
+										final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
+										if (info.id == ((NodeInfo) (authorSearchTreeNode.getUserObject())).id) // Version 2.1, id instead of path
+										{
+											//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
+											selectedTreePaths.addElement(new TreePath(authorSearchTreeNode.getPath()));
+											break;
+										}
 									}
 								}
 							}
+						}
+					}
 
-							stmt.close();
-						}
-						catch (Exception ex)
-						{
-							ex.printStackTrace();
-						}
-					}
-					else
-					{
-						//if(path.getPathCount()==3) // i.e. leaf/book
-						if (node.isLeaf())
-						{
-							if (info.path.isEmpty())
-							{
-								final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
-								while (searchTreeNodes.hasMoreElements())
-								{
-									final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
-									final NodeInfo item = (NodeInfo) searchTreeNode.getUserObject();
-									if (item.author.equals(info.author) && item.category.equals(info.category) && item.name.equals(info.name))
-									{
-										searchTree.setChecked(searchTreeNode, true);
-										break;
-									}
-								}
-							}
-							else
-							{
-								final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
-								while (searchTreeNodes.hasMoreElements())
-								{
-									final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
-									if (info.id == ((NodeInfo) (searchTreeNode.getUserObject())).id) // Version 2.1 id instead of path
-									{
-										searchTree.setChecked(searchTreeNode, true);
-										break;
-									}
-								}
-							}
-						}
-					}
+					if (!selectedTreePaths.isEmpty())
+						authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(selectedTreePaths.toArray(new TreePath[selectedTreePaths.size()]));
 				}
+				searchTreeLoopPrevention = true;
 			}
-			searchTree.addCheckStateChangeListener(searchTreeChangeListener);
 		}
 	};
 
-	//searchTree.getCheckBoxTreeSelectionModel().setSingleEventMode(true);
-	final CheckStateChangeListener<DefaultMutableTreeNode> searchTreeChangeListener = new CheckStateChangeListener<>()
+	final TreeSelectionListener authorSearchTreeChangeListener = new TreeSelectionListener()
 	{
 		@Override
-		public void checkStateChanged(WebCheckBoxTree<DefaultMutableTreeNode> searchTree, List<CheckStateChange<DefaultMutableTreeNode>> checkStateChanges)
+		public void valueChanged(TreeSelectionEvent e)
 		{
-			//for (CheckStateChange change : checkStateChanges)
-			//	System.out.println(change.getNode() + ": " + change.getOldState() + " -> " + change.getNewState());
+			//TreePath[] paths = e.getPaths();
+			//for(TreePath path : paths)
+				//System.out.println((e.isAddedPath(path) ? "Added - " : "Removed - ") + path);
 
-			//System.out.println(searchTree.getCheckedNodes().size());
-			/*
-			TreePath[] paths = e.getPaths();
-			for(TreePath path : paths)
-				System.out.println((e.isAddedPath(path) ? "Added - " : "Removed - ") + path);
-			*/
-
-			authorSearchTree.removeCheckStateChangeListener(authorSearchTreeChangeListener);
-			authorSearchTree.getCheckingModel().uncheckAll(); // To deselect all the nodes
-
-			final java.util.List<DefaultMutableTreeNode> checkedNodes = searchTree.getNodes(CheckState.checked);
-			if (!checkedNodes.isEmpty())
+			if(searchTreeLoopPrevention)
 			{
-				for (final DefaultMutableTreeNode node : checkedNodes)
+				searchTreeLoopPrevention = false;
+				//searchTree.getCheckBoxTreeSelectionModel().removeSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To deselect all the nodes. Not working [http://www.jidesoft.com/forum/viewtopic.php?f=18&t=12378&p=60863#p60863]
+				searchTree.getCheckBoxTreeSelectionModel().clearSelection();// OR removeSelectionPaths(new TreePath[]{searchTree.getPathForRow(0)}); // To deselect all the nodes
+
+				final TreePath[] treePaths = authorSearchTree.getCheckBoxTreeSelectionModel().getSelectionPaths();
+				if (treePaths != null)
 				{
-					if (node.isRoot())
+					for (final TreePath path : treePaths)
 					{
-						//authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(authorSearchTree.getModel().getRoot())}); // To select all the nodes
-						//authorSearchTree.setChecked(authorSearchTree.getRootNode(), true); // To select all the nodes
-						authorSearchTree.checkAll(); // version 2.1, this will check all regardless of the state of the root. previous command will not check all in case root was checked previously
-						break;
-					}
-
-					final NodeInfo info = (NodeInfo) node.getUserObject();
-					//if(path.getPathCount()==2) // i.e. category, there are many ways to do this using node.isLeaf/Root or info.category.equals("") ...
-					if (info.category.equals("")) // Version 1.8
-					{
-						try
+						//System.out.println("1: "+path);
+						final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+						if (node.isRoot())
 						{
-							final Statement stmt = sharedDBConnection.createStatement();
-							ResultSet rs = stmt.executeQuery("SELECT id FROM " + bookTableName + " WHERE category = '" + info.name + "' AND parent = ''"); // Version 2.1, replace path with id
-							while (rs.next())
-							{
-								final int authorSearchTreeId = rs.getInt("id");
-								final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
-								while (authorSearchTreeNodes.hasMoreElements())
-								{
-									final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
-									if (authorSearchTreeId == ((NodeInfo) (authorSearchTreeNode.getUserObject())).id) // Version 2.1, id instead of path
-										//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
-										authorSearchTree.setChecked(authorSearchTreeNode, true);
-								}
-							}
+							searchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To select all the nodes
+							break;
+						}
 
-							rs = stmt.executeQuery("SELECT parent, author FROM " + bookTableName + " WHERE (category = '" + info.name + "' AND parent != '') GROUP BY parent, author");
-							while (rs.next())
+						final NodeInfo info = (NodeInfo) node.getUserObject();
+						//if(path.getPathCount()==2) // i.e. author, there are many ways to do this using node.isLeaf/Root or info.category.equals("") ...
+						if (info.category.isEmpty()) // Version 1.8
+						{
+							try
 							{
-								final String multiBookName = rs.getString("parent");
-								final String author = rs.getString("author");
-								final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
-								while (authorSearchTreeNodes.hasMoreElements())
+								final Statement stmt = sharedDBConnection.createStatement();
+								ResultSet rs = stmt.executeQuery("SELECT id FROM " + bookTableName + " WHERE author = '" + info.name + "' AND parent = ''"); // Version 2.1
+								while (rs.next())
 								{
-									final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
-									final NodeInfo item = (NodeInfo) authorSearchTreeNode.getUserObject();
-									if (item.author.equals(author) && item.category.equals(info.name) && item.name.equals(multiBookName))
+									final int searchTreeId = rs.getInt("id");
+									final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
+									while (searchTreeNodes.hasMoreElements())
 									{
-										//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
-										authorSearchTree.setChecked(authorSearchTreeNode, true);
-										break;
+										final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
+										if (searchTreeId == ((NodeInfo) (searchTreeNode.getUserObject())).id)
+											searchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(searchTreeNode.getPath())});
 									}
 								}
-							}
 
-							stmt.close();
-						}
-						catch (Exception ex)
-						{
-							ex.printStackTrace();
-						}
-					}
-					else
-					{
-						//if(path.getPathCount()==3) // i.e. leaf/book
-						if (node.isLeaf()) // No need for this
-						{
-							if (info.path.isEmpty())
-							{
-								final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
-								while (authorSearchTreeNodes.hasMoreElements())
+								rs = stmt.executeQuery("SELECT parent, category FROM " + bookTableName + " WHERE (author = '" + info.name + "' AND parent != '') GROUP BY parent, category");
+								while (rs.next())
 								{
-									final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
-									final NodeInfo item = (NodeInfo) authorSearchTreeNode.getUserObject();
-									if (item.author.equals(info.author) && item.category.equals(info.category) && item.name.equals(info.name))
+									final String multiBookName = rs.getString("parent");
+									final String category = rs.getString("category");
+									final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
+									while (searchTreeNodes.hasMoreElements())
 									{
-										//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
-										authorSearchTree.setChecked(authorSearchTreeNode, true);
-										break;
+										final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
+										final NodeInfo item = (NodeInfo) searchTreeNode.getUserObject();
+										if (item.author.equals(info.name) && item.category.equals(category) && item.name.equals(multiBookName))
+										{
+											searchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(searchTreeNode.getPath())});
+											break;
+										}
 									}
 								}
+
+								stmt.close();
 							}
-							else
+							catch (Exception ex)
 							{
-								final Enumeration<TreeNode> authorSearchTreeNodes = ((DefaultMutableTreeNode) authorSearchTree.getModel().getRoot()).postorderEnumeration();
-								while (authorSearchTreeNodes.hasMoreElements())
+								ex.printStackTrace();
+							}
+						}
+						else
+						{
+							//if(path.getPathCount()==3) // i.e. leaf/book
+							if (node.isLeaf())
+							{
+								if (info.path.isEmpty())
 								{
-									final DefaultMutableTreeNode authorSearchTreeNode = (DefaultMutableTreeNode) authorSearchTreeNodes.nextElement();
-									if (info.id == ((NodeInfo) (authorSearchTreeNode.getUserObject())).id) // Version 2.1, id instead of path
+									final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
+									while (searchTreeNodes.hasMoreElements())
 									{
-										//authorSearchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(authorSearchTreeNode.getPath())});
-										authorSearchTree.setChecked(authorSearchTreeNode, true);
-										break;
+										final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
+										final NodeInfo item = (NodeInfo) searchTreeNode.getUserObject();
+										if (item.author.equals(info.author) && item.category.equals(info.category) && item.name.equals(info.name))
+										{
+											searchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(searchTreeNode.getPath())});
+											break;
+										}
+									}
+								}
+								else
+								{
+									final Enumeration<TreeNode> searchTreeNodes = ((DefaultMutableTreeNode) searchTree.getModel().getRoot()).postorderEnumeration();
+									while (searchTreeNodes.hasMoreElements())
+									{
+										final DefaultMutableTreeNode searchTreeNode = (DefaultMutableTreeNode) searchTreeNodes.nextElement();
+										if (info.id == ((NodeInfo) (searchTreeNode.getUserObject())).id) // Version 2.1 id instead of path
+										{
+											searchTree.getCheckBoxTreeSelectionModel().addSelectionPaths(new TreePath[]{new TreePath(searchTreeNode.getPath())});
+											break;
+										}
 									}
 								}
 							}
 						}
 					}
 				}
+				searchTreeLoopPrevention = true;
 			}
-			authorSearchTree.addCheckStateChangeListener(authorSearchTreeChangeListener);
 		}
 	};
 
@@ -390,9 +383,7 @@ public class ArabicIndexer extends JFrame
 
 			version = prop.getProperty("version");
 			biuf_version = prop.getProperty("biuf_version");
-
 			biuf_compression = prop.getProperty("biuf_compression").equals("true");
-			large_icons = prop.getProperty("large_icons").equals("true");
 
 			if (defaultLanguage.equals("nothing"))
 				new DefaultLanguage(ArabicIndexer.this);
@@ -404,15 +395,7 @@ public class ArabicIndexer extends JFrame
 			e.printStackTrace();
 		}
 
-		if(large_icons)
-		{
-			IconManager.addIconSet ( new LargIconSet() );
-			imageFolder = "images/largeSet/";
-		}
-		else
-			imageFolder = "images/";
-
-		WebLookAndFeel.setLeftToRightOrientation(language == lang.English);
+		imageFolder = "images/";
 
 		final String[] translations = StreamConverter(programFolder + "language/ArabicIndexer" + language + ".txt");
 
@@ -601,7 +584,7 @@ public class ArabicIndexer extends JFrame
 									{
 										try
 										{
-											Desktop.getDesktop().browse(new URI("http://www.maknoon.com/arabicIndexer.php"));
+											Desktop.getDesktop().browse(new URI("https://maknoon.com/community/threads/111/"));
 										}
 										catch (Exception ex)
 										{
@@ -650,19 +633,19 @@ public class ArabicIndexer extends JFrame
 		final DefaultTreeModel authorTreeModel = new DefaultTreeModel(authorTreeRoot);
 
 		// Version 1.8, WebCheckBoxTree instead of JIDE CheckBoxTree
-		searchTree = new WebCheckBoxTree<>(new DefaultTreeModel(searchRoot)); // Version 2.0, add replace '(searchRoot)' with 'new DefaultTreeModel(searchRoot)'. It causes issues when deleting in WebLaF only (https://github.com/mgarin/weblaf/issues/633)
-		authorSearchTree = new WebCheckBoxTree<>(new DefaultTreeModel(authorSearchRoot));
+		// Version 2.2, back to of JIDE CheckBoxTree
+		searchTree = new CheckBoxTree(searchRoot); // Version 2.0, replace '(searchRoot)' with 'new DefaultTreeModel(searchRoot)'. It causes issues when deleting in WebLaF only (https://github.com/mgarin/weblaf/issues/633). Version 2.2: back again
+		searchTree.getCheckBoxTreeSelectionModel().setSingleEventMode(true);
+		searchTree.getCheckBoxTreeSelectionModel().addTreeSelectionListener(searchTreeChangeListener);
+
+		authorSearchTree = new CheckBoxTree(authorSearchRoot);
+		authorSearchTree.getCheckBoxTreeSelectionModel().setSingleEventMode(true);
+		authorSearchTree.getCheckBoxTreeSelectionModel().addTreeSelectionListener(authorSearchTreeChangeListener);
 
 		tree = new JTree(treeModel);
 		authorTree = new JTree(authorTreeModel);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		authorTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-
-		//searchTree.getCheckBoxTreeSelectionModel().setSingleEventMode(true);
-		searchTree.addCheckStateChangeListener(searchTreeChangeListener);
-
-		//authorSearchTree.getCheckBoxTreeSelectionModel().setSingleEventMode(true);
-		authorSearchTree.addCheckStateChangeListener(authorSearchTreeChangeListener);
 
 		// Enable tool tips
 		ToolTipManager.sharedInstance().registerComponent(tree);
@@ -1016,7 +999,7 @@ public class ArabicIndexer extends JFrame
 														int id = 0;
 														final PreparedStatement ps1 = sharedDBConnection.prepareStatement("INSERT INTO " + bookTableName + " VALUES (default, '" + bookNames.elementAt(i) + "', '" + bookParents.elementAt(i) + "', '" + bookCategories.elementAt(i) + "', '" + bookAuthors.elementAt(i) + "', '" + bookPaths.elementAt(i) + "')", Statement.RETURN_GENERATED_KEYS);
 														ps1.executeUpdate();
-														try (ResultSet rs = ps1.getGeneratedKeys();)
+														try (ResultSet rs = ps1.getGeneratedKeys())
 														{
 															if (rs.next())
 																id = rs.getInt(1);
@@ -1849,7 +1832,7 @@ public class ArabicIndexer extends JFrame
 		indexingMenu.add(treePopupRootsIndexingMenuItem);
 		indexingMenu.add(treePopupLuceneIndexingMenuItem);
 
-		final WebPopupMenu indexingPopupMenu = new WebPopupMenu();
+		final JPopupMenu indexingPopupMenu = new JPopupMenu();
 		indexingPopupMenu.add(popupIndexingMenuItem);
 		indexingPopupMenu.add(popupRootsIndexingMenuItem);
 		indexingPopupMenu.add(popupLuceneIndexingMenuItem);
@@ -1859,7 +1842,6 @@ public class ArabicIndexer extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-                /*
 				final Component c = (Component)e.getSource();
                 indexingPopupMenu.updateUI(); // Version 1.6, for getPreferredSize() to return correct value
                 final Dimension dim = indexingPopupMenu.getPreferredSize();
@@ -1867,8 +1849,7 @@ public class ArabicIndexer extends JFrame
                     indexingPopupMenu.show(c, c.getWidth()-dim.width, -dim.height);
 				else
 					indexingPopupMenu.show(c, 0, -dim.height);
-					*/
-				indexingPopupMenu.showAbove(indexingButton);
+				//indexingPopupMenu.showAbove(indexingButton); TODO recheck the above
 			}
 		});
 
@@ -3362,14 +3343,10 @@ public class ArabicIndexer extends JFrame
 		render.setOpenIcon(null);
 		render.setClosedIcon(null);
 		searchTree.setCellRenderer(render);
-		//searchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To select all the nodes by default
-		//searchTree.setChecked(searchTree.getRootNode(), true); // To select all the nodes by default
-		searchTree.checkAll(); // version 2.1, this will check all regardless of the state of the root. previous command will not check all in case root was checked previously
+		searchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To select all the nodes by default
 
 		authorSearchTree.setCellRenderer(render);
-		//authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(authorSearchTree.getModel().getRoot())}); // To select all the nodes by default
-		//authorSearchTree.setChecked(authorSearchTree.getRootNode(), true); // To select all the nodes by default
-		authorSearchTree.checkAll(); // version 2.1, this will check all regardless of the state of the root. previous command will not check all in case root was checked previously
+		authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(authorSearchTree.getModel().getRoot())}); // To select all the nodes by default
 
 		final JTabbedPane searchTreeTabbedPane = new JTabbedPane();
 		searchTreeTabbedPane.addTab(translations[57], new JScrollPane(searchTree));
@@ -3413,7 +3390,7 @@ public class ArabicIndexer extends JFrame
 		searchGroup.add(arabicRootsSearchTypeButton);
 		searchGroup.add(arabicLuceneSearchTypeButton);
 
-		final WebPopupMenu searchOptionsPopupMenu = new WebPopupMenu();
+		final JPopupMenu searchOptionsPopupMenu = new JPopupMenu();
 		searchOptionsPopupMenu.add(defaultSearchTypeButton);
 		searchOptionsPopupMenu.add(arabicRootsSearchTypeButton);
 		searchOptionsPopupMenu.add(arabicLuceneSearchTypeButton);
@@ -3426,13 +3403,13 @@ public class ArabicIndexer extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				/*final Component c = (Component)e.getSource();
+				final Component c = (Component)e.getSource();
                 searchOptionsPopupMenu.updateUI(); // Version 1.6, for getPreferredSize() to return correct value
 				if(language!=lang.English)
 					searchOptionsPopupMenu.show(c, c.getWidth()-searchOptionsPopupMenu.getPreferredSize().width, c.getHeight());
 				else
-					searchOptionsPopupMenu.show(c, 0, c.getHeight());*/
-				searchOptionsPopupMenu.showBelow(searchOptionsButton);
+					searchOptionsPopupMenu.show(c, 0, c.getHeight());
+				//searchOptionsPopupMenu.showBelow(searchOptionsButton); TODO recheck the above
 			}
 		});
 
@@ -3449,24 +3426,11 @@ public class ArabicIndexer extends JFrame
 				treeModel.reload();
 				authorTreeModel.reload();
 
-				// Disable listener (not needed here) to avoid the exception while deleting a node:
-				//https://github.com/mgarin/weblaf/issues/633
-				searchTree.removeCheckStateChangeListener(searchTreeChangeListener);
-				authorSearchTree.removeCheckStateChangeListener(authorSearchTreeChangeListener);
-
 				((DefaultTreeModel) searchTree.getModel()).reload();
+				searchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To select all the nodes by default
+
 				((DefaultTreeModel) authorSearchTree.getModel()).reload();
-
-				//searchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(searchTree.getModel().getRoot())}); // To select all the nodes by default
-				//searchTree.setChecked(searchTree.getRootNode(), true); // To select all the nodes by default
-				searchTree.checkAll(); // version 2.1, this will check all regardless of the state of the root. previous command will not check all in case root was checked previously
-
-				//authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(authorSearchTree.getModel().getRoot())}); // To select all the nodes by default
-				//authorSearchTree.setChecked(authorSearchTree.getRootNode(), true); // To select all the nodes by default
-				authorSearchTree.checkAll(); // version 2.1, this will check all regardless of the state of the root. previous command will not check all in case root was checked previously
-
-				searchTree.addCheckStateChangeListener(searchTreeChangeListener);
-				authorSearchTree.addCheckStateChangeListener(authorSearchTreeChangeListener);
+				authorSearchTree.getCheckBoxTreeSelectionModel().setSelectionPaths(new TreePath[]{new TreePath(authorSearchTree.getModel().getRoot())}); // To select all the nodes by default
 
 				bookName = "";
 				bookPath = "";
@@ -3490,25 +3454,24 @@ public class ArabicIndexer extends JFrame
 			}
 		});
 
-		final JPanel listControlPanel = new JPanel(new GridLayout(1, 5));
-		listControlPanel.add(orderButton);
-		listControlPanel.add(addButton);
-		listControlPanel.add(editButton);
-		listControlPanel.add(deleteButton);
-		listControlPanel.add(indexingButton);
+		final JPanel listOptionsPanel = new JPanel(new GridBagLayout());
+		listOptionsPanel.add(orderButton, new GridBagConstraints(0, 0, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(listSearchButton, new GridBagConstraints(1, 0, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(listSearchTextField, new GridBagConstraints(2, 0, 3, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(exportButton, new GridBagConstraints(0, 1, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(addButton, new GridBagConstraints(1, 1, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(editButton, new GridBagConstraints(2, 1, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(deleteButton, new GridBagConstraints(3, 1, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+		listOptionsPanel.add(indexingButton, new GridBagConstraints(4, 1, 1, 1, 1, 1,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
 
-		final JPanel listSearchPanel = new JPanel(new BorderLayout());
-		final JPanel listSearchButtonsPanel = new JPanel(new GridLayout(1, 2));
-		listSearchButtonsPanel.add(exportButton);
-		listSearchButtonsPanel.add(listSearchButton);
-
-		if (language != lang.English) listSearchPanel.add(listSearchButtonsPanel, BorderLayout.EAST);
-		else listSearchPanel.add(listSearchButtonsPanel, BorderLayout.WEST);
-		listSearchPanel.add(listSearchTextField, BorderLayout.CENTER);
-
-		final JPanel listOptionsPanel = new JPanel(new GridLayout(2, 1));
-		listOptionsPanel.add(listSearchPanel);
-		listOptionsPanel.add(listControlPanel);
 		listPanel.add(listOptionsPanel, BorderLayout.SOUTH);
 		//listPanel.setPreferredSize(listPanel.getPreferredSize()); // Version 1.5, To fix the width. Version 1.7, Removed after using JSplitPane
 
@@ -3606,11 +3569,12 @@ public class ArabicIndexer extends JFrame
 									boolean fullSearch = true;
 
 									// Version 1.5
-									final java.util.List<DefaultMutableTreeNode> checkedNodes = searchTree.getNodes(CheckState.checked);
-									if (!checkedNodes.isEmpty())
+									final TreePath[] treePaths = searchTree.getCheckBoxTreeSelectionModel().getSelectionPaths();
+									if(treePaths!=null)
 									{
-										for (DefaultMutableTreeNode node : checkedNodes) // Version 1.7
+										for(TreePath path : treePaths) // Version 1.7
 										{
+											final DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
 											final NodeInfo info = (NodeInfo) node.getUserObject();
 											//if(path.getPathCount()==2) // i.e. category, there are many ways to do this using node.isLeaf/Root  ...
 											if (info.path.equals("searchCategory")) // Version 1.8
@@ -3656,7 +3620,7 @@ public class ArabicIndexer extends JFrame
 
 									final BooleanQuery booleanQuery = booleanQueryBuilder.build(); // Version 1.8
 
-									if (/*!filterQuery.isEmpty()*/!booleanQuery.toString().isEmpty() || (fullSearch && !checkedNodes.isEmpty()))
+									if (/*!filterQuery.isEmpty()*/!booleanQuery.toString().isEmpty() || (fullSearch && treePaths!=null))
 									{
                                         /* Version 1.9, replaced by TopScoreDocCollector
                                         final org.apache.lucene.util.FixedBitSet bits = new org.apache.lucene.util.FixedBitSet((defaultSearchTypeButton.isSelected()?defaultSearcher:(arabicRootsSearchTypeButton.isSelected()?arabicRootsSearcher:arabicLuceneSearcher)).getIndexReader().maxDoc()); // Version 1.7
@@ -3705,7 +3669,7 @@ public class ArabicIndexer extends JFrame
 												final TextFragment[] frag = highlighter.getBestTextFragments(tokenStream, txt, false, 1);
 												for (TextFragment f : frag)
 													if ((f != null) && (f.getScore() > 0F))
-														text = (text.isEmpty() ? "" : (text + " ... ")) + f.toString();
+														text = (text.isEmpty() ? "" : (text + " ... ")) + f;
 
 												items.add("<HTML>" + (language != lang.English ? "<div align=right>" : "") + "(" + (++index) + ")<font color=maroon>[" + (doc.get("parent").isEmpty() ? doc.get("name") : doc.get("parent")) + "]</font> " + text + "</HTML>"); // Version 1.6/1.7
 												searchResultsPathVector.add(doc.get("path"));
@@ -3727,7 +3691,7 @@ public class ArabicIndexer extends JFrame
 													final TextFragment[] frag = highlighter.getBestTextFragments(tokenStream, txt, false, 1);
 													for (TextFragment tf : frag)
 														if ((tf != null) && (tf.getScore() > 0))
-															text = (text.isEmpty() ? "" : (text + " ... ")) + tf.toString();
+															text = (text.isEmpty() ? "" : (text + " ... ")) + tf;
 
 													items.add("<HTML>" + (language != lang.English ? "<div align=right>" : "") + "(" + (++index) + ")<font color=maroon>[" + (doc.get("parent").isEmpty() ? doc.get("name") : doc.get("parent")) + "]</font> " + text + "</HTML>"); // Version 1.6/1.7
 													searchResultsPathVector.add(doc.get("path"));
@@ -4786,7 +4750,7 @@ public class ArabicIndexer extends JFrame
 						// will have transfer data ONLY while the mouse button is
 						// depressed.  However, when the user releases the mouse
 						// button, this method will be called one last time.  And when
-						// when this method attempts to getTransferData, Java will throw
+						// this method attempts to getTransferData, Java will throw
 						// an 'InvalidDnDOperationException: No drop current'.  Since we know that the
 						// exception is coming, we simply catch it and ignore it.
 						// Normal behavior, do not try to remove this exception
@@ -5532,9 +5496,6 @@ public class ArabicIndexer extends JFrame
 
 	public void createNodes()
 	{
-		//searchTree.removeCheckStateChangeListener(searchTreeChangeListener);
-		//authorSearchTree.removeCheckStateChangeListener(authorSearchTreeChangeListener);
-
 		treeRoot.removeAllChildren();
 		searchRoot.removeAllChildren();
 		authorTreeRoot.removeAllChildren();
@@ -5655,9 +5616,6 @@ public class ArabicIndexer extends JFrame
 		}
 
 		orderButton.doClick();
-
-		//searchTree.addCheckStateChangeListener(searchTreeChangeListener);
-		//authorSearchTree.addCheckStateChangeListener(authorSearchTreeChangeListener);
 	}
 
 	/*
@@ -5693,47 +5651,12 @@ public class ArabicIndexer extends JFrame
 		return null;
 	}
 
-	//https://github.com/mgarin/weblaf/blob/master/modules/ui/src/com/alee/laf/list/WebListCellRenderer.java
-	// TODO: it is better for loading but it kills the performance once you start scrolling the list.
-	static class SearchListRenderer extends WebStyledLabel implements ListCellRenderer
-	{
-		public SearchListRenderer()
-		{
-			super();
-
-			//setOpaque(true);
-			//putClientProperty("html.disable", Boolean.TRUE);
-		}
-
-		//protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
-
-		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus)
-		{
-			setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
-			setText(value.toString());
-
-			// Border
-			//final ListUI lui = list.getUI ();
-			//final int sw = com.alee.laf.list.WebListStyle.selectionShadeWidth;
-			//final int sw = StyleConstants.shadeWidth;
-			final int sw = 2; // from the old src
-			setMargin(sw + 8, sw + 10, sw + 8, sw + 10);
-
-			// Orientation
-			setComponentOrientation(list.getComponentOrientation());
-			//applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-
-			return this;
-		}
-	}
-
 	static String programFolder, eProgramFolder;
 
 	// Version 1.4
 	static private Vector<String> updateFiles;
 
-	static private FileLock lock; // Global so that it will not be GC, otherwise lock will released
+	static private FileLock lock; // Global so that it will not be GC, otherwise lock will be released
 	static private FileChannel lockChannel;
 
 	public static void main(String[] args)
@@ -5762,49 +5685,15 @@ public class ArabicIndexer extends JFrame
 
 		updateFiles = new Vector<>(Arrays.asList(args));
 
-        /*
-        try
-        {
-            // Set cross-platform Java L&F (also called "Metal") for MAC since it is not the default.
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        }
-        catch(Exception e){e.printStackTrace();}
-        //*/
+		com.formdev.flatlaf.FlatLightLaf.setup();
+		UIManager.put("TitlePane.menuBarEmbedded", false);
+		UIManager.put("Button.arc", 0);
+		UIManager.put("Button.margin", new Insets(4,13,4,13));
+		UIManager.put("CheckBox.arc", 0);
+		UIManager.put("TabbedPane.tabWidthMode", "equal");
+		UIManager.put("TabbedPane.tabAreaAlignment", "fill");
+		UIManager.put("OptionPane.maxCharactersPerLine", 0);
 
-        /*
-        try
-        {
-            com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel laf = new com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel();
-            UIManager.setLookAndFeel(laf);
-            laf.getDefaults().put("defaultFont", new Font("Tahoma", Font.PLAIN, 12));
-
-        /*
-        for(UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
-        {
-            if("Nimbus".equals(info.getName()))
-            {
-                // Very difficult [http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/color.html]
-                //UIManager.put("control", new Color(241, 240, 227));
-                //UIManager.put("nimbusBase", new Color(200, 190, 157));
-                //UIManager.put("nimbusBlueGrey", new Color(222, 173, 98));
-
-                UIManager.setLookAndFeel(info.getClassName());
-                break;
-            }
-        }
-        */
-		//}
-		//catch(Exception e){e.printStackTrace();}
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				//com.alee.laf.WebLookAndFeel.labelFont = new Font ("Tahoma", Font.PLAIN, 12);
-				//LanguageManager.setDefaultLanguage(LanguageConstants.ARABIC);
-				WebLookAndFeel.setLeftToRightOrientation(false);
-				WebLookAndFeel.install();
-				new ArabicIndexer();
-			}
-		});
+		SwingUtilities.invokeLater(ArabicIndexer::new);
 	}
 }

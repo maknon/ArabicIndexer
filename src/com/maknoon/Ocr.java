@@ -1,6 +1,5 @@
 package com.maknoon;
 
-import com.alee.laf.filechooser.WebFileChooser;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.apache.pdfbox.Loader;
@@ -49,7 +48,7 @@ public final class Ocr extends JDialog
 		controlPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), translation[1], TitledBorder.CENTER, 0, null, Color.red));
 		add(controlPanel, BorderLayout.SOUTH);
 
-		final WebFileChooser fc = new WebFileChooser();
+		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fc.setMultiSelectionEnabled(true);
 
