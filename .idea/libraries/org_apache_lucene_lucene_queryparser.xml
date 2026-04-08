@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="org.apache.lucene:lucene-queryparser" type="repository">
+    <properties maven-id="org.apache.lucene:lucene-queryparser:10.2.2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-queryparser/10.2.2/lucene-queryparser-10.2.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-core/10.2.2/lucene-core-10.2.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-queries/10.2.2/lucene-queries-10.2.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-sandbox/10.2.2/lucene-sandbox-10.2.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-facet/10.2.2/lucene-facet-10.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

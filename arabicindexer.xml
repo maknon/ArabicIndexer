@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>ArabicIndexer.jar</jar>
+  <outfile>ArabicIndexer.exe</outfile>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://www.oracle.com/java/technologies/javase-downloads.html</downloadUrl>
+  <supportUrl>https://www.maknoon.com</supportUrl>
+  <stayAlive>false</stayAlive>
+  <icon>images.nsis\icon.ico</icon>
+  <jre>
+    <path>jdk</path>
+    <requires64Bit>true</requires64Bit>
+    <requiresJdk>true</requiresJdk>
+  </jre>
+  <versionInfo>
+    <fileVersion>2.4.0.0</fileVersion>
+    <txtFileVersion>2.4</txtFileVersion>
+    <fileDescription>ÈÑäÇãÌ ãÝåÑÓ ÇáãÎØæØÇÊ</fileDescription>
+    <copyright>©2024 Maknoon Apps</copyright>
+    <productVersion>2.4.0.0</productVersion>
+    <txtProductVersion>2.4</txtProductVersion>
+    <productName>ãÝåÑÓ ÇáãÎØæØÇÊ</productName>
+    <companyName>ÈÑÇãÌ ãßäæä</companyName>
+    <internalName>ãÝåÑÓ ÇáãÎØæØÇÊ</internalName>
+    <originalFilename>ArabicIndexer.exe</originalFilename>
+    <language>ARABIC</language>
+  </versionInfo>
+</launch4jConfig>

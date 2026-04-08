@@ -1,0 +1,15 @@
+- Scoring
+	http://blog.architexa.com/2010/12/custom-lucene-scoring/?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+Architexa+%28Architexa+-+Working+with+Large+Codebases%29
+	The only option is to boost the feqh words while indexing (list should be created from «·„’ÿ·Õ«  «·›ﬁÂÌ….txt taken from alshamela „⁄Ã„ «·„’ÿ·Õ«  «·›ﬁÂÌ…)
+- Nested Document query support
+	https://issues.apache.org/jira/browse/LUCENE-2454
+- JTree Lazy loading
+	http://download.oracle.com/javase/tutorial/uiswing/components/tree.html
+- import/export, the list of book in arabicbook file. need urduBook instead for Urdu. segregate Urdu from Arabic in the index folders as well and everything so that one instance of AI can have three databases/indexes for all of them.
+- URL with space issue, need to replace space with %20 (not important, the name should not have a space in it)
+- Limit the number of shamela files to be converted since it is almost reaching 4000 so limit to 3,000 or better 1,000. the reason is because the number of threads per jvm which depends on OS
+- Remove the temp folder. you need to create it in the system temp everytime using Files.createTempDirectory
+- index search: add documentation on how to use NOT "»œÊ‰" and advanced way e.g. (word1 OR word2) AND word3 NOT word4. look for other syntaxing. add link to lucene tutorial as well. put for AudioCataloger
+- ghost4j is not needed for mac/linux
+
+Ibrahim A. Al-Kharashi, Martha W. Evens: Comparing Words, Stems, and Roots as Index Terms in an Arabic Information Retrieval System.

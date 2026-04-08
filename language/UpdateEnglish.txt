@@ -1,0 +1,47 @@
+You do not have permissions to write on this folder. Choose another one.
+Yes
+No
+Updating process is in progress. Are you sure you want to stop it (This may result in program fault or corrupted database)?
+-------------------
+Warning
+ Importing books is completed
+-------------------
+-------------------
+-------------------
+-------------------
+There is another update file in the list. You cannot have two updates at the same time.
+Cannot import database because of incompatibility with the program (newer or older than the program)
+The current version is the same of newer than the update file.
+Import books'/manuscripts' files with the indexes if available
+Cannot import book/manuscript file in case of importing through the internet.
+ Update the program is in progress. wait until it is done ...
+Warning
+Continue
+Open
+-------------------
+Book Indexer Update File
+Import books/manuscripts
+-------------------
+Install
+Type
+Update Name
+Version
+Size
+Browse
+Browse for books/manuscripts files
+Path
+Select the location for the imported PDF files
+Update
+Close
+Select All
+-------------------
+Imported Book Path: 
+The upgrade requires version (
+) or newer. First upgrade to version (
+Out of Memory. You need to increase the memory by editing ArabicIndexer.l4j.ini
+Under the main program folder as follow:
+- Increase Xmx128m to Xmx256m or bigger if required.
+[Change in file startup.sh for Linux/Unix or Info.plist in Mac OSX]
+-------------------
+Please note that the following files are not imported since they are already in the database:
+Please note that the file is not imported since it is in arabic language.

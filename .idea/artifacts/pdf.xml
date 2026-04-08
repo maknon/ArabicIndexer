@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="pdf">
+    <output-path>$PROJECT_DIR$/out/ArabicIndexer/pdf</output-path>
+    <root id="root">
+      <element id="dir-copy" path="$PROJECT_DIR$/pdf" />
+    </root>
+  </artifact>
+</component>
